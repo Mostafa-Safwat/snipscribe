@@ -7,16 +7,16 @@ sudo apt-get install -y python3-venv
 ```
 **Creating Virtual Environment:**
 ```sh
-python3 -m venv (name of your choice)
+python3 -m venv venv
 ```
 **Activate the virtual environment:**
    - On Linux:
      ```sh
-     source (name of your environment)/bin/activate
+     source venv/bin/activate
      ```
    - On Windows:
      ```sh
-     .\(name of your environment)\Scripts\activate
+     .\venv\Scripts\activate
      ```
 
 ## Installing Libraries
