@@ -1,7 +1,7 @@
 import os
 from pytubefix import YouTube, Playlist
 
-url = 'https://youtu.be/tiJI2np0SJo?si=ujg51upipcPUfqNU'
+url = "" # Enter the URL of the video or playlist you want to download
 
 # Function to create a folder to store the downloaded files
 def create_folder():

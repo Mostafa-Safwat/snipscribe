@@ -2,7 +2,7 @@ import torchaudio
 from speechbrain.pretrained import EncoderClassifier
 
 # Path to the audio file
-file_location = ""
+file_location = "" # Enter the path to the audio file you want to detect the language of
 
 def detect_language(file_location):
   # Set the backend to ffmpeg
