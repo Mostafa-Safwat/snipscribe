@@ -32,3 +32,7 @@ pip install -r requirements.txt
 sudo apt-get install ffmpeg
 ```
 
+**Installing olama on Linux:**
+```sh
+curl -fsSL https://ollama.com/install.sh | sh
+```
