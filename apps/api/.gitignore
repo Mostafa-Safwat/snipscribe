@@ -1,0 +1,11 @@
+node_modules
+# Keep environment variables out of version control
+.env
+schema.prisma
+documentation
+
+local-admins.json
+swagger.json
+ethereal-test-email.json
+
+files

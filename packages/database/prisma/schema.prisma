@@ -1,0 +1,157 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+
+  previewFeatures = ["views", "relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Models
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userSettings    UserSettings?
+  shareableLinks  ShareableLink[]
+  notes           Note[]
+  favorites       Favorite[]
+  summaryRequests SummaryRequest[]
+  refreshTokens   RefreshToken[]
+
+  @@map("users")
+}
+
+model UserSettings {
+  id           Int     @id @default(autoincrement())
+  userId       Int     @unique @map("user_id")
+  sharing      Boolean @default(false)
+  notification Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model RefreshToken {
+  id                        Int      @id @default(autoincrement())
+  userId                    Int      @map("user_id")
+  currentHashedRefreshToken String?  @unique(map: "current_hashed_refresh_token")
+  createdAt                 DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_token")
+}
+
+model SummaryRequest {
+  id     Int @id @default(autoincrement())
+  userId Int @map("user_id")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  summaries Summary[]
+
+  @@map("summary_requests")
+}
+
+model Summary {
+  id               Int      @id @default(autoincrement())
+  summaryRequestId Int      @map("summary_request_id")
+  title            String
+  body             String
+  status           Status   @default(PENDING)
+  isShared         Boolean  @default(false) @map("is_shared")
+  createdAt        DateTime @default(now()) @map("created_at")
+  videoId          Int      @unique @map("video_id")
+
+  summaryRequest SummaryRequest @relation(fields: [summaryRequestId], references: [id], onDelete: Cascade)
+  video          Video          @relation(fields: [videoId], references: [id])
+  shareableLink  ShareableLink?
+  notes          Note[]
+  favorites      Favorite[]
+
+  @@map("summaries")
+}
+
+model Video {
+  id        Int      @id @default(autoincrement())
+  title     String
+  type      Type
+  url       String
+  createdAt DateTime @default(now()) @map("created_at")
+  summary   Summary?
+
+  @@map("videos")
+}
+
+model ShareableLink {
+  id         Int        @id @default(autoincrement())
+  userId     Int        @map("user_id")
+  summaryId  Int        @unique @map("summary_id")
+  slug       String     @unique
+  permission Permission @default(VIEW)
+  validUntil DateTime   @map("valid_until")
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  summary Summary @relation(fields: [summaryId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("shareable_links")
+}
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  summaryId Int      @map("summary_id")
+  userId    Int      @map("user_id")
+  body      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  summary Summary @relation(fields: [summaryId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notes")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  summaryId Int      @map("summary_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  summary Summary @relation(fields: [summaryId], references: [id], onDelete: Cascade)
+
+  @@map("favorites")
+}
+
+// Enums
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Permission {
+  VIEW
+  EDIT
+}
+
+enum Type {
+  YOUTUBE
+  FILE
+}
+
+enum Status {
+  PENDING
+  COMPLETED
+  FAILED
+  ARCHIVED
+}

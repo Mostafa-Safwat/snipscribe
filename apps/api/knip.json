@@ -1,0 +1,18 @@
+{
+    "include": ["classMembers"],
+    "exclude": [
+        "files",
+        "dependencies",
+        "unlisted",
+        "binaries",
+        "unresolved",
+        "exports",
+        "nsExports",
+        "types",
+        "nsTypes",
+        "enumMembers",
+        "duplicates"
+    ],
+    "ignore": ["**/**.controller.ts", "**/**.dto.ts"],
+    "fix": true
+}

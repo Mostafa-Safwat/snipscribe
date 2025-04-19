@@ -1,0 +1,40 @@
+{
+    "pipeline": {
+        "build": {
+            "dependsOn": ["^db:generate", "^build", "generate"],
+            "outputs": ["dist/**"]
+        },
+        "generate": {
+            "dependsOn": ["^generate", "^build"]
+        },
+        "lint": {
+            "outputs": []
+        },
+        "dev": {
+            "cache": false,
+            "dependsOn": ["^db:generate"]
+        },
+        "db:generate": {},
+        "db:push": {
+            "cache": false
+        },
+        "db:migrate-dev": {
+            "cache": false
+        },
+        "db:reset": {
+            "cache": false
+        },
+        "initial-setup": {
+            "dependsOn": ["db:generate", "build"],
+            "cache": false
+        },
+        "typescript-client:generate": {
+            "cache": false,
+            "dependsOn": ["generate:swagger"]
+        },
+        "seed": {
+            "cache": false
+        },
+        "build:watch": {}
+    }
+}

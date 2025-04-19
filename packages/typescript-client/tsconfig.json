@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "declaration": true,
+        "declarationDir": "dist/types",
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "target": "esnext",
+        "sourceMap": false,
+        "outDir": "./dist",
+        "baseUrl": "./src",
+        "rootDir": "./",
+        "moduleResolution": "node",
+        "paths": {
+            "@/*": ["./*"]
+        }
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules"]
+}

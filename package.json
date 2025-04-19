@@ -1,0 +1,43 @@
+{
+    "name": "snipscribe",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "build": "turbo run build",
+        "dev": "turbo run dev --parallel",
+        "lint": "turbo run lint",
+        "format": "prettier --write .",
+        "prepare": "husky install",
+        "typescript-client:generate": "turbo run typescript-client:generate",
+        "generate": "turbo run generate",
+        "build:watch": "turbo run build:watch",
+        "db:reset": "turbo run db:reset",
+        "seed": "turbo run seed"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^19.3.0",
+        "@commitlint/config-conventional": "^19.2.2",
+        "husky": "^8.0.2",
+        "lint-staged": "^15.2.10",
+        "prettier": "^3.2.5",
+        "turbo": "^1.13.3"
+    },
+    "engines": {
+        "npm": ">=7.0.0",
+        "node": ">=14.0.0"
+    },
+    "packageManager": "yarn@1.22.5",
+    "lint-staged": {
+        "apps/**/*.{js,ts,jsx,tsx,md,vue}": [
+            "npx prettier --write",
+            "turbo run lint --"
+        ],
+        "*.json": [
+            "npx prettier --write"
+        ]
+    }
+}
