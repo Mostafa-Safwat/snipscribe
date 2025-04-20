@@ -3,6 +3,7 @@ import { Role } from '@snipscribe/database';
 
 import { ISeeder } from '@/database/seeder';
 import { PrismaService } from '@/prisma.service';
+import { encryptPassword } from '@/utils/password';
 
 import { users } from './data';
 
@@ -13,6 +14,7 @@ export class UserSeederService implements ISeeder {
     async seed(): Promise<void> {
         await Promise.all(
             users.map(async user => {
+                user.password = await encryptPassword(user.password);
                 await this.prisma.user.upsert({
                     where: { username: user.username },
                     update: {},

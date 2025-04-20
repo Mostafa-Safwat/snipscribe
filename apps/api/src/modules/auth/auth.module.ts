@@ -7,6 +7,8 @@ import { PrismaModule } from '@/prisma.module';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
     imports: [
@@ -24,7 +26,7 @@ import { AuthService } from './auth.service';
         }),
         ConfigModule,
     ],
-    providers: [AuthService],
+    providers: [AuthService, JwtStrategy, JwtRefreshTokenStrategy],
     controllers: [AuthController],
     exports: [AuthService],
 })

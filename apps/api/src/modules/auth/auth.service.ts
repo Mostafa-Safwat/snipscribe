@@ -4,9 +4,11 @@ import { JwtService } from '@nestjs/jwt';
 import crypto from 'crypto';
 
 import { PrismaService } from '@/prisma.service';
+import { comparePassword } from '@/utils/password';
 
 import { UserDto } from '../user/types/user.dto';
 import { UserService } from '../user/user.service';
+import { LoginDto } from './types/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +21,30 @@ export class AuthService {
         @Inject(forwardRef(() => UserService))
         private readonly userService: UserService
     ) {}
+
+    async validateUser({ email, password }: LoginDto) {
+        const user = await this.userService.getByEmail({ email });
+        if (!user) return null;
+
+        const isPasswordValid = await comparePassword(password, user.password);
+        if (!isPasswordValid) return null;
+
+        return user;
+    }
+
+    async login({ email, password }: LoginDto) {
+        const user = await this.validateUser({ email, password });
+        if (!user) throw new UnauthorizedException('Invalid credentials');
+
+        const refreshToken = this.getRefreshJWT({ user });
+        await this.setRefreshToken({ refreshToken: refreshToken.token, userId: user.id });
+        const accessToken = this.getJWT({ user });
+        return {
+            user,
+            accessToken: accessToken.token,
+            refreshToken: refreshToken.token,
+        };
+    }
 
     async getRefreshToken({ refreshToken }: { refreshToken: string }) {
         const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');

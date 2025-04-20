@@ -1,11 +1,15 @@
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+
 import { UserDto } from '@/modules/user/types/user.dto';
 
-export class AccessTokenData {
-    userId: number;
-    buildingName: string;
-    floorNumber: number;
-    apartmentNumber: number;
-    role: string;
+export class LoginDto {
+    @IsEmail()
+    @IsNotEmpty()
+    email: string;
+
+    @IsString()
+    @IsNotEmpty()
+    password: string;
 }
 
 export class RefreshTokenData {
@@ -15,15 +19,16 @@ export class RefreshTokenData {
 }
 
 export class RequestTokenDto {
-    username: string;
+    email: string;
 }
 
 export class VerifyTokenDto {
-    username: string;
+    email: string;
     token: number;
 }
 
-export class TokenDto {
+export class LoginResponseDto {
+    user: UserDto;
     accessToken: string;
     refreshToken: string;
 }

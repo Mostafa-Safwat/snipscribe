@@ -56,8 +56,8 @@ async function bootstrap(onlyGenerateSwagger = false) {
 
     // Swagger
     const config = new DocumentBuilder()
-        .setTitle('Babylon')
-        .setDescription('API for Babylon')
+        .setTitle('Snipscribe')
+        .setDescription('API for Snipscribe')
         .setVersion('1.0.0')
         .addServer(CORS_WHITELIST[0])
         .addServer(CORS_WHITELIST[1])
@@ -72,7 +72,7 @@ async function bootstrap(onlyGenerateSwagger = false) {
         swaggerOptions: {
             persistAuthorization: true,
         },
-        customSiteTitle: 'Babylon API Docs',
+        customSiteTitle: 'Snipscribe API Docs',
         customCss: swaggerCSS,
     };
     const swaggerJSON = JSON.stringify(document);

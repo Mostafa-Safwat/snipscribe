@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export const UserRole = {
     ADMIN: 'ADMIN',
@@ -26,27 +26,20 @@ export class CreateUserDto {
 
     @IsString()
     password: string;
-
-    @IsEnum(UserRole)
-    role: UserRole;
 }
 
 export class UpdateUserDto {
-    @IsOptional()
     @IsString()
-    name?: string;
+    @IsOptional()
+    email?: string;
 
-    @IsOptional()
     @IsString()
+    @IsOptional()
     username?: string;
 
-    @IsOptional()
     @IsString()
-    chatId?: number;
-
     @IsOptional()
-    @IsEnum(UserRole)
-    role?: UserRole;
+    password?: string;
 }
 
 export class GetUsersResponse {

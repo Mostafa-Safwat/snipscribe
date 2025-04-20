@@ -14,6 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Role } from '@snipscribe/database';
 
 import { AuthorizationGuard } from '@/common/guards/authorization.guard';
+import { AllowSelf } from '@/decorators/allow-self.decorator';
 import { AllowedRoles } from '@/decorators/allowed-roles.decorator';
 
 import { JwtAuthGuard } from '../auth/strategies/jwt.strategy';
@@ -21,42 +22,50 @@ import { CreateUserDto, GetUsersResponse, UpdateUserDto, UserDto } from './types
 import { UserService } from './user.service';
 
 @Controller({ path: 'users', version: '1' })
-@UseGuards(AuthorizationGuard)
-@UseGuards(JwtAuthGuard)
 @ApiTags('Users')
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get()
+    @UseGuards(AuthorizationGuard)
+    @UseGuards(JwtAuthGuard)
     @AllowedRoles(Role.ADMIN)
     async getUsers(): Promise<GetUsersResponse> {
         return this.userService.getUsers();
     }
 
-    @Get(':id')
+    @Get(':userId')
+    @UseGuards(AuthorizationGuard)
+    @UseGuards(JwtAuthGuard)
     @AllowedRoles(Role.ADMIN)
-    getUser(@Param('id', new ParseIntPipe()) id: number): Promise<UserDto> {
-        return this.userService.getById({ id });
+    @AllowSelf()
+    getUser(@Param('userId', new ParseIntPipe()) userId: number): Promise<UserDto> {
+        return this.userService.getById({ id: userId });
     }
 
     @Post()
-    @AllowedRoles(Role.ADMIN)
     async createUser(@Body(new ValidationPipe({ whitelist: true })) postData: CreateUserDto): Promise<UserDto> {
         return this.userService.save({ data: postData });
     }
 
-    @Patch(':id')
+    @Patch(':userId')
+    @UseGuards(AuthorizationGuard)
+    @UseGuards(JwtAuthGuard)
     @AllowedRoles(Role.ADMIN)
+    @AllowSelf()
     updateUser(
-        @Param('id', new ParseIntPipe()) id: number,
+        @Param('userId', new ParseIntPipe()) userId: number,
         @Body(new ValidationPipe({ whitelist: true })) postData: UpdateUserDto
     ): Promise<UserDto> {
-        return this.userService.update({ id, data: postData });
+        return this.userService.update({ id: userId, data: postData });
     }
 
-    @Delete(':id')
+    @Delete(':userId')
+    @UseGuards(AuthorizationGuard)
+    @UseGuards(JwtAuthGuard)
     @AllowedRoles(Role.ADMIN)
-    deleteUser(@Param('id', new ParseIntPipe()) id: number): Promise<UserDto> {
-        return this.userService.delete({ id });
+    @AllowSelf()
+    deleteUser(@Param('userId', new ParseIntPipe()) userId: number): Promise<UserDto> {
+        return this.userService.delete({ id: userId });
     }
 }

@@ -6,8 +6,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { UserService } from '@/modules/user/user.service';
 
-import { AccessTokenData } from '../types/auth.dto';
-
 @Injectable()
 export class JwtRefreshAuthGuard extends AuthGuard('jwt-refresh-token') {}
 
@@ -28,7 +26,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-ref
         });
     }
 
-    async validate(request: Request, _payload: AccessTokenData) {
+    async validate(request: Request, _payload: { userId: number }) {
         const refreshToken = request.headers.refresh as string;
 
         return this.userService.getByRefreshToken({ refreshToken });

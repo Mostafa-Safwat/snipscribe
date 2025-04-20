@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/commo
 import { Reflector } from '@nestjs/core';
 import { Role } from '@snipscribe/database';
 
+import { ALLOW_SELF_KEY } from '@/decorators/allow-self.decorator';
 import { ROLES_KEY } from '@/decorators/allowed-roles.decorator';
 import { UserDto } from '@/modules/user/types/user.dto';
 import { PrismaService } from '@/prisma.service';
@@ -20,10 +21,20 @@ export class AuthorizationGuard implements CanActivate {
 
         if (user.role === Role.ADMIN) return true;
 
+        const allowSelf = this.reflector.getAllAndOverride<boolean>(ALLOW_SELF_KEY, [
+            context.getHandler(),
+            context.getClass(),
+        ]);
+        if (allowSelf && user.id === Number(request.params.userId)) {
+            return true;
+        }
+
         const allowedRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
             context.getHandler(),
             context.getClass(),
         ]);
+
+        if (!allowedRoles) return true;
 
         if (!allowedRoles.includes(user.role as Role)) return false;
 
