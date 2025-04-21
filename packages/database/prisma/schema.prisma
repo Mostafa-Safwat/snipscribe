@@ -53,8 +53,10 @@ model RefreshToken {
 }
 
 model SummaryRequest {
-  id     Int @id @default(autoincrement())
-  userId Int @map("user_id")
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  language  String
+  createdAt DateTime @default(now()) @map("created_at")
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   summaries Summary[]
@@ -65,8 +67,8 @@ model SummaryRequest {
 model Summary {
   id               Int      @id @default(autoincrement())
   summaryRequestId Int      @map("summary_request_id")
-  title            String
-  body             String
+  title            String?
+  body             String?  @db.Text
   status           Status   @default(PENDING)
   isShared         Boolean  @default(false) @map("is_shared")
   createdAt        DateTime @default(now()) @map("created_at")
@@ -83,7 +85,6 @@ model Summary {
 
 model Video {
   id        Int      @id @default(autoincrement())
-  title     String
   type      Type
   url       String
   createdAt DateTime @default(now()) @map("created_at")

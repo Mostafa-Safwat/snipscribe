@@ -53,7 +53,8 @@
         "rfc6902": "^5.0.1",
         "rxjs": "^7.8.1",
         "undici": "^6.10.2",
-        "uuid": "^9.0.0"
+        "uuid": "^9.0.0",
+        "ytpl": "^2.3.0"
     },
     "devDependencies": {
         "@compodoc/compodoc": "^1.1.19",
