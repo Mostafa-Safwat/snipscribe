@@ -26,27 +26,23 @@ import {
 } from './types/summary.dto';
 
 @Controller({ path: 'summaries', version: '1' })
+@UseGuards(AuthorizationGuard)
+@UseGuards(JwtAuthGuard)
 @ApiTags('Summaries')
 export class SummaryController {
     constructor(private readonly summaryService: SummaryService) {}
 
     @Get()
-    @UseGuards(AuthorizationGuard)
-    @UseGuards(JwtAuthGuard)
     async getUserSummaries(@Req() { user }: RequestWithUser): Promise<GetSummariesResponse> {
         return this.summaryService.getUserSummaries({ userId: user.id });
     }
 
     @Get('public')
-    @UseGuards(AuthorizationGuard)
-    @UseGuards(JwtAuthGuard)
     async getPublicSummaries(): Promise<GetSummariesResponse> {
         return this.summaryService.getPublicSummaries();
     }
 
     @Get(':summaryId')
-    @UseGuards(AuthorizationGuard)
-    @UseGuards(JwtAuthGuard)
     async getSummary(
         @Param('summaryId', new ParseIntPipe()) summaryId: number,
         @Req() { user }: RequestWithUser
@@ -73,8 +69,6 @@ export class SummaryController {
     }
 
     @Patch(':summaryId')
-    @UseGuards(AuthorizationGuard)
-    @UseGuards(JwtAuthGuard)
     updateSummary(
         @Param('summaryId', new ParseIntPipe()) summaryId: number,
         @Body(new ValidationPipe({ whitelist: true })) postData: UpdateSummaryRequestDto,
