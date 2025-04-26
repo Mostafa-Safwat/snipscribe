@@ -35,6 +35,9 @@ export class UserService {
             where: {
                 id,
             },
+            include: {
+                userSettings: true,
+            },
         });
     }
 
@@ -77,6 +80,9 @@ export class UserService {
                 email: data.email,
                 username: data.username,
                 password: data.password,
+                userSettings: {
+                    create: {},
+                },
             },
         });
 

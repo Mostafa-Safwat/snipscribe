@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 export const Status = {
     PENDING: 'PENDING',
@@ -19,6 +19,9 @@ export type Type = (typeof Type)[keyof typeof Type];
 export class SummaryRequestDto {
     id: number;
     userId: number;
+    isShared: boolean;
+
+    summaries?: SummaryDto[];
 }
 
 export class SummaryDto {
@@ -28,7 +31,6 @@ export class SummaryDto {
     title: string;
     body: string;
     status: Status;
-    isShared: boolean;
     createdAt: Date;
 
     summaryRequest?: SummaryRequestDto;
@@ -37,7 +39,6 @@ export class SummaryDto {
 
 export class VideoDto {
     id: number;
-    title: string;
     type: Type;
     url: string;
     createdAt: Date;
@@ -56,7 +57,13 @@ export class CreateSummaryRequestDto {
     language: string;
 }
 
+export class UpdateSummaryRequestDto {
+    @IsBoolean()
+    @IsNotEmpty()
+    isShared: boolean;
+}
+
 export class GetSummariesResponse {
-    summaries: SummaryDto[];
+    summaryRequests: SummaryRequestDto[];
     size: number;
 }

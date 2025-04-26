@@ -56,6 +56,7 @@ model SummaryRequest {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
   language  String
+  isShared  Boolean  @default(false) @map("is_shared")
   createdAt DateTime @default(now()) @map("created_at")
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -70,7 +71,6 @@ model Summary {
   title            String?
   body             String?  @db.Text
   status           Status   @default(PENDING)
-  isShared         Boolean  @default(false) @map("is_shared")
   createdAt        DateTime @default(now()) @map("created_at")
   videoId          Int      @unique @map("video_id")
 
