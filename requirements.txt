@@ -42,9 +42,10 @@ ollama==0.4.8
 openai-whisper==20240930
 orjson==3.10.16
 packaging==24.2
+psycopg2-binary==2.9.10
 pydantic==2.11.3
 pydantic_core==2.33.1
-pytubefix==8.12.3
+pytubefix @ git+https://github.com/felipeucelli/pytubefix.git@2542e8f94b2b4eef104fe6069eafc3831239ce1f
 PyYAML==6.0.2
 regex==2024.11.6
 requests==2.32.3

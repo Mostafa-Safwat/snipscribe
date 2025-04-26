@@ -6,7 +6,37 @@ import ollama
 import subprocess
 import time
 
-url = ''
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
+# Database connection
+def get_db_connection():
+    return psycopg2.connect(
+        dbname="snipscribe",
+        user="root",
+        password="root",
+        host="localhost",
+        port=5432
+    )
+
+def check_summary():
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    cursor.execute('SELECT * FROM "summaries" WHERE status = %s', ('PENDING',))
+    summary = cursor.fetchone()
+    if not summary:
+        cursor.close()
+        conn.close()
+        return None
+    
+    cursor.execute('SELECT * FROM "videos" WHERE id = %s', (summary['video_id'],))
+    video = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return {
+        'summary': summary,
+        'video': video
+    }
 
 # Function to create a folder to store the downloaded files
 def create_folder():
@@ -17,32 +47,24 @@ def create_folder():
 
 # Function to download the video or playlist from pytube
 def pytube_downloader(url, path):
-    titles = []
-    if 'playlist' in url:
-        pl = Playlist(url)
-        for video in pl.videos:
-            ys = video.streams.get_audio_only()
-            ys.download(path)
-            titles.append(video.title)
-    else:
-        yt = YouTube(url, 'WEB')
-        ys = yt.streams.get_audio_only()
-        ys.download(path)
-        titles.append(yt.title)
-    return titles
+    title = ''
+    yt = YouTube(url, 'WEB')
+    ys = yt.streams.get_audio_only()
+    ys.download(path)
+    title = yt.title
+
+    return title
 
 # Function to transcribe the audio files using Whisper
-def transcribe_text(titles, path):
+def transcribe_text(title, path):
     model = whisper.load_model("large")
-    transcriptions = []
-    for title in titles:
-        audio_file = os.path.join(path, f"{title}.m4a")
-        result = model.transcribe(audio_file)
-        transcriptions.append({
-            'title': title,
-            'transcription': result["text"]
-        })
-    return transcriptions
+    transcription = ''
+    audio_file = os.path.join(path, f"{title}.m4a")
+    result = model.transcribe(audio_file)
+    transcription = result["text"]
+    clear_cache()
+    os.remove(audio_file)
+    return transcription
 
 # Function to clear the cache from memory
 def clear_cache():
@@ -68,13 +90,34 @@ def summarize_text(trans):
         },
     ])
 
+    clear_cache()
+
     return response['message']['content']
 
-create_folder()
-titles = pytube_downloader(url, path)
-transcriptions = transcribe_text(titles, path)
-clear_cache()
-summarization = summarize_text(transcriptions[0]['transcription']) 
-clear_cache()
+def save_summary(id, summary, title):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        'UPDATE "summaries" SET status = %s, body = %s, title = %s WHERE id = %s',
+        ('COMPLETED', summary, title, id)
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+if __name__ == "__main__":
+    create_folder()
+    while True:
+        result = check_summary()
+        if result:
+            url = result['video']['url']
+            id = result['summary']['id']
+            title = pytube_downloader(url, path)
+            transcription = transcribe_text(title, path)
+            summary = summarize_text(transcription['transcription'])
+            save_summary(id, summary, title)
+        else:
+            print("No pending summaries found.")
+     
 
 
