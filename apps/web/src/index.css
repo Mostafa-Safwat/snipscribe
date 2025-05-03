@@ -1,0 +1,39 @@
+/* Base styles that don't interfere with MUI theming */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Remove the place-items and display flex from body */
+/* These can cause layout issues with Material UI components */
+
+/* Remove the color scheme and color definitions */
+/* Let MUI handle these through its theme system */
+
+/* Remove the button styles that might conflict with MUI */
+/* MUI has its own button styling system */
+
+/* Remove the media queries for light/dark mode */
+/* This will be handled by your Redux theme system */
+
+/* Any custom global styles that shouldn't be handled by MUI can go here */
