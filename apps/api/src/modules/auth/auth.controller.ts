@@ -1,9 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards, ValidationPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 
+import { UserDto } from '../user/types/user.dto';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './strategies/jwt.strategy';
 import { JwtRefreshAuthGuard } from './strategies/jwt-refresh.strategy';
-import { LoginDto, LoginResponseDto, RefreshTokenDto, RequestWithUser } from './types/auth.dto';
+import { LoginDto, RequestWithUser } from './types/auth.dto';
 
 @Controller({ path: 'auth', version: '1' })
 @ApiTags('Auth')
@@ -11,23 +14,39 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post('login')
-    async login(@Body(new ValidationPipe({ whitelist: true })) postData: LoginDto): Promise<LoginResponseDto> {
+    async login(
+        @Req() req: Request,
+        @Body(new ValidationPipe({ whitelist: true })) postData: LoginDto
+    ): Promise<UserDto> {
         const { user, accessToken, refreshToken } = await this.authService.login(postData);
 
-        return {
-            user,
-            accessToken,
-            refreshToken,
-        };
+        this.setLoginCookies(req, { accessTokenCookie: accessToken.cookie, refreshTokenCookie: refreshToken.cookie });
+        delete user.password;
+
+        return user;
     }
 
     @Get('refresh')
+    @HttpCode(HttpStatus.OK)
     @UseGuards(JwtRefreshAuthGuard)
-    async refreshAccessToken(@Req() req: RequestWithUser): Promise<RefreshTokenDto> {
-        const { token } = this.authService.getJWT({ user: req.user });
+    async refreshAccessToken(@Req() req: RequestWithUser) {
+        const { token } = this.authService.getCookieWithJWT({ userId: req.user.id });
 
-        return {
-            accessToken: token,
-        };
+        this.setLoginCookies(req, { accessTokenCookie: token, refreshTokenCookie: req.cookies.Refresh });
+
+        return true;
+    }
+
+    @Post('logout')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard)
+    async logout(@Req() req: RequestWithUser) {
+        req.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
+        return true;
+    }
+
+    private setLoginCookies(req: Request, user: { accessTokenCookie: string; refreshTokenCookie: string }) {
+        const { accessTokenCookie, refreshTokenCookie } = user;
+        req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     }
 }

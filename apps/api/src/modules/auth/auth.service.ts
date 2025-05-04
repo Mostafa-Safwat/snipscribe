@@ -36,13 +36,14 @@ export class AuthService {
         const user = await this.validateUser({ email, password });
         if (!user) throw new UnauthorizedException('Invalid credentials');
 
-        const refreshToken = this.getRefreshJWT({ user });
-        await this.setRefreshToken({ refreshToken: refreshToken.token, userId: user.id });
-        const accessToken = this.getJWT({ user });
+        const accessTokenCookie = this.getCookieWithJWT({ userId: user.id });
+        const refreshTokenCookie = this.getCookieWithRefreshJWT({ userId: user.id });
+        await this.setRefreshToken({ refreshToken: refreshTokenCookie.token, userId: user.id });
+
         return {
             user,
-            accessToken: accessToken.token,
-            refreshToken: refreshToken.token,
+            accessToken: accessTokenCookie,
+            refreshToken: refreshTokenCookie,
         };
     }
 
@@ -72,33 +73,37 @@ export class AuthService {
         });
     }
 
-    public getJWT({ user }: { user: UserDto }) {
-        const payload = {
-            userId: user.id,
-        };
-
+    public getCookieWithJWT({ userId }: { userId: number }) {
+        const payload = { userId };
         const token = this.jwtService.sign(payload, {
             secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
             expiresIn: `${this.configService.get<string>('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}s`,
         });
-
+        const cookie = `Authentication=${token}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=${this.configService.get<string>(
+            'JWT_ACCESS_TOKEN_EXPIRATION_TIME'
+        )}`;
         return {
+            cookie,
             token,
         };
     }
 
-    public getRefreshJWT({ user }: { user: UserDto }) {
-        const payload = {
-            userId: user.id,
-        };
-
+    public getCookieWithRefreshJWT({ userId }: { userId: number }) {
+        const payload = { userId };
         const token = this.jwtService.sign(payload, {
             secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
             expiresIn: `${this.configService.get<string>('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}s`,
         });
-
+        const cookie = `Refresh=${token}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=${this.configService.get<string>(
+            'JWT_REFRESH_TOKEN_EXPIRATION_TIME'
+        )}`;
         return {
+            cookie,
             token,
         };
+    }
+
+    public getCookiesForLogOut() {
+        return ['Authentication=; HttpOnly; Path=/; Max-Age=0', 'Refresh=; HttpOnly; Path=/; Max-Age=0'];
     }
 }

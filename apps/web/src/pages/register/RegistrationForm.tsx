@@ -44,20 +44,17 @@ const RegistrationForm: React.FC = () => {
                 },
             };
 
-            // Call the registration API
             await auth.localRegister(registerRequest);
 
-            // After successful registration, automatically log in the user
-            const loginResponse = await auth.localLogin({
+            const user = await auth.localLogin({
                 loginDto: {
                     email: values.email,
                     password: values.password,
                 },
             });
 
-            if (loginResponse && loginResponse.user) {
-                // Initialize user session
-                initUser(loginResponse.user, LoginProvider.LOCAL);
+            if (user) {
+                initUser(user, LoginProvider.LOCAL);
             }
         } catch (err) {
             console.error('Registration error:', err);

@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { Request } from 'express';
 
 import { UserDto } from '@/modules/user/types/user.dto';
 
@@ -33,7 +34,7 @@ export class LoginResponseDto {
     refreshToken: string;
 }
 
-export class RequestWithUser extends Request {
+export interface RequestWithUser extends Request {
     user: UserDto;
     refreshToken?: string;
 }

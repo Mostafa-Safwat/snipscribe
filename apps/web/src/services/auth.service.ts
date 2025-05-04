@@ -14,8 +14,13 @@ export function authService() {
         return await usersApiClient.createUser(params);
     }
 
+    async function logout() {
+        return await authApiClient.logout();
+    }
+
     return {
         localLogin,
         localRegister,
+        logout,
     };
 }

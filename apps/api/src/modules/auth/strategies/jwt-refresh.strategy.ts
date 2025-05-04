@@ -18,7 +18,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-ref
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
                 (request: Request) => {
-                    return request.headers.refresh as string;
+                    return request?.cookies?.Refresh;
                 },
             ]),
             secretOrKey: configService.get('JWT_REFRESH_TOKEN_SECRET'),
@@ -27,8 +27,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-ref
     }
 
     async validate(request: Request, _payload: { userId: number }) {
-        const refreshToken = request.headers.refresh as string;
-
-        return this.userService.getByRefreshToken({ refreshToken });
+        const refreshToken = request.cookies?.Refresh;
+        return await this.userService.getByRefreshToken({ refreshToken });
     }
 }

@@ -4,6 +4,9 @@ import qs from 'qs';
 import { CustomException } from '@/types/exceptions';
 
 import { refreshTokenService } from './refresh-token.service';
+import { authService } from './auth.service';
+import { store } from '@/store';
+import { logout } from '@/store/slices/authSlice';
 
 interface RequestInitWithRetries extends RequestInit {
     retries?: number;
@@ -24,6 +27,7 @@ export const middleware: Middleware = {
                 statusCode: context.response.status,
             });
         }
+        context.init.retries = 0;
         return;
     },
     onError: async (context: ErrorContext): Promise<void | Response> => {
@@ -63,6 +67,13 @@ const handle401 = async (context: ResponseContext & { init: RequestInitWithRetri
         if (context.url.includes('auth/logout')) {
             return;
         }
+        store.dispatch(logout());
+
+        window.location.href = '/login';
+
+        const { logout: apiLogout } = authService();
+        await apiLogout();
+
         throw new Error('Unauthorized');
     }
     const { getNewRefreshToken } = refreshTokenService();

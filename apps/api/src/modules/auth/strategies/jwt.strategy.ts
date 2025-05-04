@@ -4,7 +4,7 @@ import { AuthGuard, PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { UserService } from '@/modules/user/user.service';
+import { UserService } from '../../user/user.service';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {}
@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
                 (request: Request) => {
-                    return request.headers.authorization?.replace('Bearer ', '');
+                    return request?.cookies?.Authentication;
                 },
             ]),
             secretOrKey: configService.get('JWT_ACCESS_TOKEN_SECRET'),
@@ -26,10 +26,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
 
     async validate(payload: { userId: number }) {
-        if (!payload.userId) return;
+        if (!payload?.userId) return;
 
-        return await this.userService.getById({
-            id: payload.userId,
-        });
+        return await this.userService.getById({ id: payload.userId });
     }
 }
