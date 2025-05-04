@@ -6,6 +6,7 @@ import { PrismaModule } from '@/prisma.module';
 
 import { LoggerMiddleware } from '../../common/middleware/logger.middleware';
 import { AuthModule } from '../auth/auth.module';
+import { SummaryModule } from '../summary/summary.module';
 import { UserModule } from '../user/user.module';
 
 @Module({
@@ -20,6 +21,7 @@ import { UserModule } from '../user/user.module';
         ScheduleModule.forRoot(),
         UserModule,
         AuthModule,
+        SummaryModule,
     ],
 })
 export class AppModule {
