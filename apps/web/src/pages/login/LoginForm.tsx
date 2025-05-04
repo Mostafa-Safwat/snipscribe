@@ -36,15 +36,15 @@ const LoginForm: React.FC = () => {
         setError(null);
 
         try {
-            const response = await auth.localLogin({
+            const user = await auth.localLogin({
                 loginDto: {
                     email: values.email,
                     password: values.password,
                 },
             });
 
-            if (response && response.user) {
-                initUser(response.user, LoginProvider.LOCAL, redirectUrl);
+            if (user) {
+                initUser(user, LoginProvider.LOCAL, redirectUrl);
             } else {
                 throw new Error('Login failed. Please check your credentials and try again.');
             }

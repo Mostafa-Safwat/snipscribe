@@ -125,12 +125,12 @@ export class SummaryService {
             data: {
                 userId,
                 language: data.language,
+                isShared: user.userSettings?.sharing || false,
                 summaries: {
                     createMany: {
                         data: videos.map(video => ({
                             videoId: video.id,
                             status: 'PENDING',
-                            isShared: user.userSettings?.sharing || false,
                         })),
                     },
                 },
