@@ -12,10 +12,11 @@ export class UserSeederService implements ISeeder {
     constructor(private readonly prisma: PrismaService) {}
 
     async seed(): Promise<void> {
+        console.log('Seeding users...');
         await Promise.all(
             users.map(async user => {
                 user.password = await encryptPassword(user.password);
-                await this.prisma.user.upsert({
+                const userData = await this.prisma.user.upsert({
                     where: { username: user.username },
                     update: {},
                     create: {
@@ -25,6 +26,8 @@ export class UserSeederService implements ISeeder {
                         password: user.password,
                     },
                 });
+
+                console.log(`User seeded`, userData);
             })
         );
     }
