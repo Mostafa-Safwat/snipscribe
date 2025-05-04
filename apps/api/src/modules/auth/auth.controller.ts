@@ -4,7 +4,6 @@ import { Request } from 'express';
 
 import { UserDto } from '../user/types/user.dto';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './strategies/jwt.strategy';
 import { JwtRefreshAuthGuard } from './strategies/jwt-refresh.strategy';
 import { LoginDto, RequestWithUser } from './types/auth.dto';
 
@@ -39,7 +38,6 @@ export class AuthController {
 
     @Post('logout')
     @HttpCode(HttpStatus.OK)
-    @UseGuards(JwtAuthGuard)
     async logout(@Req() req: RequestWithUser) {
         req.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
         return true;
