@@ -4,6 +4,7 @@ import whisper
 import torch, gc
 import subprocess
 import time
+import re
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -33,11 +34,16 @@ def check_summary():
     
     cursor.execute('SELECT * FROM "videos" WHERE id = %s', (summary['video_id'],))
     video = cursor.fetchone()
+
+    cursor.execute('SELECT * FROM "summary_requests" WHERE id = %s', (summary['summary_request_id'],))
+    request = cursor.fetchone()
+
     cursor.close()
     conn.close()
     return {
         'summary': summary,
-        'video': video
+        'video': video,
+        'language': request['language'],
     }
 
 # Function to create a folder to store the downloaded files
@@ -88,7 +94,7 @@ def clear_cache():
     torch.cuda.empty_cache()
 
 # Function to transcribe the audio file using Ollama
-def summarize_text(trans):
+def summarize_text(trans, language):
     time.sleep(10)
     print("Summarizing...")
     # Start the Ollama server
@@ -105,13 +111,16 @@ def summarize_text(trans):
             { 'role': 'system', 'content': '/no_think' },
             {
                 'role': 'user',
-                'content': f"Summarize this in its original language: {trans}"
+                'content': f"Summarize this in {language}: {trans}"
             },
         ])
 
+    # Clean the response by removing the <think>...</think> section
+    content = response['message']['content']
+    cleaned_content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL)
+    
     clear_cache()
-    print(response['message']['content'])
-    return response['message']['content']
+    return cleaned_content.strip()
 
 def save_summary(id, summary, title):
     print("Saving summary...")
@@ -132,9 +141,10 @@ if __name__ == "__main__":
         if result:
             url = result['video']['url']
             id = result['summary']['id']
+            language = result['language']
             title = pytube_downloader(url, path)
             transcription = transcribe_text(title, path)
-            summary = summarize_text(transcription)  # Fixed here
+            summary = summarize_text(transcription, language)
             save_summary(id, summary, title)
         else:
             print("No pending summaries found.")
