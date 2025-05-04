@@ -67,7 +67,7 @@ export const useAuth = () => {
             return;
         }
 
-        navigate(`/dashboard`);
+        navigate(`/home`);
         toast.success('Welcome back!');
     };
 

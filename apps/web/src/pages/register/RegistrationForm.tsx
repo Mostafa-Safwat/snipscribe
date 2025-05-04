@@ -1,32 +1,32 @@
 import React, { useState } from 'react';
-import { FormControlLabel, Checkbox, Alert, Collapse, Link, Grid2 as Grid } from '@mui/material';
+import { Alert, Collapse } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { Formik, Form } from 'formik';
-import { useNavigate } from 'react-router-dom';
 import FormTextField from '@/components/form/FormTextField';
 import PasswordField from '@/components/form/PasswordField';
 import { registrationValidationSchema } from './validationSchema';
+import { useAuth } from '@/hooks/useAuth';
+import { authService } from '@/services/auth.service';
+import { LoginProvider } from '@/types/enums';
+import { CreateUserRequest } from '@snipscribe/typescript-client';
 
 interface RegistrationFormValues {
-    firstName: string;
-    lastName: string;
+    username: string;
     email: string;
     password: string;
     confirmPassword: string;
-    agreeToTerms: boolean;
 }
 
 const RegistrationForm: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
-    const navigate = useNavigate();
+    const { initUser } = useAuth();
+    const auth = authService();
 
     const initialValues: RegistrationFormValues = {
-        firstName: '',
-        lastName: '',
+        username: '',
         email: '',
         password: '',
         confirmPassword: '',
-        agreeToTerms: false,
     };
 
     const handleSubmit = async (
@@ -36,16 +36,32 @@ const RegistrationForm: React.FC = () => {
         setError(null);
 
         try {
-            // This would typically be an API call to register the user
-            console.log('Registration form submitted:', values);
+            const registerRequest: CreateUserRequest = {
+                createUserDto: {
+                    username: values.username,
+                    email: values.email,
+                    password: values.password,
+                },
+            };
 
-            // For demo purposes, simulate a successful registration
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // Call the registration API
+            await auth.localRegister(registerRequest);
 
-            // Redirect to login page after successful registration
-            navigate('/login', { state: { registrationSuccess: true } });
+            // After successful registration, automatically log in the user
+            const loginResponse = await auth.localLogin({
+                loginDto: {
+                    email: values.email,
+                    password: values.password,
+                },
+            });
+
+            if (loginResponse && loginResponse.user) {
+                // Initialize user session
+                initUser(loginResponse.user, LoginProvider.LOCAL);
+            }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred during registration');
+            console.error('Registration error:', err);
+            setError(err instanceof Error ? err.message : 'An error occurred during registration. Please try again.');
         } finally {
             setSubmitting(false);
         }
@@ -53,7 +69,7 @@ const RegistrationForm: React.FC = () => {
 
     return (
         <Formik initialValues={initialValues} validationSchema={registrationValidationSchema} onSubmit={handleSubmit}>
-            {({ isSubmitting, values, handleChange }) => (
+            {({ isSubmitting }) => (
                 <Form style={{ width: '100%' }}>
                     <Collapse in={!!error} timeout={500}>
                         <Alert severity="error" sx={{ mb: 2, width: '100%' }} onClose={() => setError(null)}>
@@ -61,29 +77,15 @@ const RegistrationForm: React.FC = () => {
                         </Alert>
                     </Collapse>
 
-                    <Grid container spacing={2}>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <FormTextField
-                                required
-                                fullWidth
-                                id="firstName"
-                                label="First Name"
-                                name="firstName"
-                                autoComplete="given-name"
-                                autoFocus
-                            />
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <FormTextField
-                                required
-                                fullWidth
-                                id="lastName"
-                                label="Last Name"
-                                name="lastName"
-                                autoComplete="family-name"
-                            />
-                        </Grid>
-                    </Grid>
+                    <FormTextField
+                        required
+                        fullWidth
+                        id="username"
+                        label="Username"
+                        name="username"
+                        autoComplete="username"
+                        autoFocus
+                    />
 
                     <FormTextField
                         margin="normal"
@@ -115,30 +117,6 @@ const RegistrationForm: React.FC = () => {
                         label="Confirm Password"
                         id="confirmPassword"
                         autoComplete="new-password"
-                    />
-
-                    <FormControlLabel
-                        sx={{ mt: 2 }}
-                        control={
-                            <Checkbox
-                                color="primary"
-                                name="agreeToTerms"
-                                checked={values.agreeToTerms}
-                                onChange={handleChange}
-                            />
-                        }
-                        label={
-                            <span>
-                                I agree to the{' '}
-                                <Link href="#" underline="hover">
-                                    Terms and Conditions
-                                </Link>{' '}
-                                and{' '}
-                                <Link href="#" underline="hover">
-                                    Privacy Policy
-                                </Link>
-                            </span>
-                        }
                     />
 
                     <LoadingButton
