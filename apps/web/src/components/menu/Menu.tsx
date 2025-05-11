@@ -63,7 +63,6 @@ const Menu = () => {
                 id="account-menu"
                 open={open}
                 onClose={handleClose}
-                onClick={handleClose}
                 slotProps={{
                     paper: {
                         elevation: 0,

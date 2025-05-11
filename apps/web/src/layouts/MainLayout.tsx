@@ -25,7 +25,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const pathname = usePathname();
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <Box>
             <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
                 <Drawer />
 
@@ -39,7 +39,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 >
                     <Header>
                         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                            Aquail Home
+                            Snipscribe
                         </Typography>
                         <ThemeToggle />
                     </Header>

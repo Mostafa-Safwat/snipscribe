@@ -2,6 +2,7 @@ import { lazy, ComponentType } from 'react';
 import MainLayout from '@/layouts/MainLayout';
 import Register from '@/pages/register/Register';
 import NewSummaryRequest from '@/pages/new-summary-request/NewSummaryRequest';
+import SummaryOverview from '@/pages/summary-overview/SummaryOverview';
 
 const Login = lazy(() => import('@/pages/login/Login'));
 const Home = lazy(() => import('@/pages/home/Home'));
@@ -41,6 +42,12 @@ const routes: RouteConfig[] = [
         component: NewSummaryRequest,
         layout: MainLayout,
         exact: true,
+        protected: true,
+    },
+    {
+        path: '/summary/:summaryId',
+        component: SummaryOverview,
+        layout: MainLayout,
         protected: true,
     },
     {

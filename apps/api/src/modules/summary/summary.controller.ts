@@ -21,8 +21,9 @@ import { SummaryService } from './summary.service';
 import {
     CreateSummaryRequestDto,
     GetSummariesResponse,
+    SummaryDto,
     SummaryRequestDto,
-    UpdateSummaryRequestDto,
+    UpdateSummaryDto,
 } from './types/summary.dto';
 
 @Controller({ path: 'summaries', version: '1' })
@@ -46,18 +47,18 @@ export class SummaryController {
     async getSummary(
         @Param('summaryId', new ParseIntPipe()) summaryId: number,
         @Req() { user }: RequestWithUser
-    ): Promise<SummaryRequestDto> {
-        const summaryRequest = await this.summaryService.getById({ id: summaryId, userId: user.id });
+    ): Promise<SummaryDto> {
+        const summary = await this.summaryService.getById({ id: summaryId, userId: user.id });
 
-        if (!summaryRequest) {
+        if (!summary) {
             throw new NotFoundException('Summary not found');
         }
 
-        if (summaryRequest.userId !== user.id && !summaryRequest.isShared) {
+        if (summary.summaryRequest.userId !== user.id && !summary.isShared) {
             throw new NotFoundException('Summary not found');
         }
 
-        return summaryRequest;
+        return summary;
     }
 
     @Post()
@@ -71,9 +72,9 @@ export class SummaryController {
     @Patch(':summaryId')
     updateSummary(
         @Param('summaryId', new ParseIntPipe()) summaryId: number,
-        @Body(new ValidationPipe({ whitelist: true })) postData: UpdateSummaryRequestDto,
+        @Body(new ValidationPipe({ whitelist: true })) postData: UpdateSummaryDto,
         @Req() { user }: RequestWithUser
-    ): Promise<SummaryRequestDto> {
+    ): Promise<SummaryDto> {
         return this.summaryService.update({ id: summaryId, data: postData, userId: user.id });
     }
 }

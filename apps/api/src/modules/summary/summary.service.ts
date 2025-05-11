@@ -4,7 +4,7 @@ import { PrismaService } from '@/prisma.service';
 import { extractLinksFromPlaylist, isPlaylist } from '@/utils/youtube';
 
 import { UserService } from '../user/user.service';
-import { CreateSummaryRequestDto, UpdateSummaryRequestDto } from './types/summary.dto';
+import { CreateSummaryRequestDto, UpdateSummaryDto } from './types/summary.dto';
 
 @Injectable()
 export class SummaryService {
@@ -22,22 +22,18 @@ export class SummaryService {
             throw new NotFoundException('User not found');
         }
 
-        const summaryRequests = await this.prisma.summaryRequest.findMany({
+        const summaries = await this.prisma.summary.findMany({
             orderBy: {
                 id: 'desc',
             },
             where: {
-                userId,
+                summaryRequest: {
+                    userId,
+                },
             },
             include: {
-                summaries: {
-                    where: {
-                        status: 'COMPLETED',
-                    },
-                    include: {
-                        video: true,
-                    },
-                },
+                video: true,
+                summaryRequest: true,
             },
         });
         const size = await this.prisma.summaryRequest.count({
@@ -46,11 +42,11 @@ export class SummaryService {
             },
         });
 
-        return { summaryRequests, size };
+        return { summaries, size };
     }
 
     async getPublicSummaries() {
-        const summaryRequests = await this.prisma.summaryRequest.findMany({
+        const summaries = await this.prisma.summary.findMany({
             orderBy: {
                 id: 'desc',
             },
@@ -58,24 +54,17 @@ export class SummaryService {
                 isShared: true,
             },
             include: {
-                summaries: {
-                    where: {
-                        status: 'COMPLETED',
-                    },
-                    include: {
-                        notes: true,
-                        video: true,
-                    },
-                },
+                notes: true,
+                video: true,
             },
         });
-        const size = await this.prisma.summaryRequest.count({
+        const size = await this.prisma.summary.count({
             where: {
                 isShared: true,
             },
         });
 
-        return { summaryRequests, size };
+        return { summaries, size };
     }
 
     async getById({ id, userId }: { id: number; userId: number }) {
@@ -85,17 +74,13 @@ export class SummaryService {
             throw new NotFoundException('User not found');
         }
 
-        const summary = await this.prisma.summaryRequest.findUnique({
+        const summary = await this.prisma.summary.findUnique({
             where: {
                 id,
             },
             include: {
-                summaries: {
-                    include: {
-                        notes: true,
-                        video: true,
-                    },
-                },
+                video: true,
+                summaryRequest: true,
             },
         });
 
@@ -125,12 +110,12 @@ export class SummaryService {
             data: {
                 userId,
                 language: data.language,
-                isShared: user.userSettings?.sharing || false,
                 summaries: {
                     createMany: {
                         data: videos.map(video => ({
                             videoId: video.id,
                             status: 'PENDING',
+                            isShared: user.userSettings?.sharing || false,
                         })),
                     },
                 },
@@ -140,18 +125,18 @@ export class SummaryService {
         return summaryRequest;
     }
 
-    async update({ id, data, userId }: { id: number; data: UpdateSummaryRequestDto; userId: number }) {
+    async update({ id, data, userId }: { id: number; data: UpdateSummaryDto; userId: number }) {
         const summaryRequest = await this.getById({ id, userId });
 
         if (!summaryRequest) {
-            throw new NotFoundException('Summary request not found');
+            throw new NotFoundException('Summary not found');
         }
 
-        if (!summaryRequest.summaries.length) {
-            throw new BadRequestException('Cannot update summary request with no completed summaries');
+        if (summaryRequest.status !== 'COMPLETED') {
+            throw new BadRequestException('Cannot update summary that is not completed');
         }
 
-        const updatedSummaryRequest = await this.prisma.summaryRequest.update({
+        const updatedSummaryRequest = await this.prisma.summary.update({
             where: {
                 id,
             },

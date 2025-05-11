@@ -19,7 +19,7 @@ export type Type = (typeof Type)[keyof typeof Type];
 export class SummaryRequestDto {
     id: number;
     userId: number;
-    isShared: boolean;
+    language: string;
 
     summaries?: SummaryDto[];
 }
@@ -32,6 +32,7 @@ export class SummaryDto {
     body: string;
     status: Status;
     createdAt: Date;
+    isShared: boolean;
 
     summaryRequest?: SummaryRequestDto;
     video?: VideoDto;
@@ -57,13 +58,13 @@ export class CreateSummaryRequestDto {
     language: string;
 }
 
-export class UpdateSummaryRequestDto {
+export class UpdateSummaryDto {
     @IsBoolean()
     @IsNotEmpty()
     isShared: boolean;
 }
 
 export class GetSummariesResponse {
-    summaryRequests: SummaryRequestDto[];
+    summaries: SummaryDto[];
     size: number;
 }
