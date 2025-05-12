@@ -30,6 +30,7 @@ export class SummaryService {
                 summaryRequest: {
                     userId,
                 },
+                status: 'COMPLETED',
             },
             include: {
                 video: true,
