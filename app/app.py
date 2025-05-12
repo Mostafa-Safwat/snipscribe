@@ -58,7 +58,7 @@ def create_folder():
 def pytube_downloader(url, path):
     print("Downloading...")
     title = ''
-    yt = YouTube(url, 'WEB')
+    yt = YouTube(url, 'WEB', use_oauth=True)
     ys = yt.streams.get_audio_only()
     ys.download(path)
     title = yt.title
@@ -111,7 +111,25 @@ def summarize_text(trans, language):
             { 'role': 'system', 'content': '/no_think' },
             {
                 'role': 'user',
-                'content': f"Summarize this in {language}: {trans}"
+                'content': f"""
+                            You are a highly focused assistant. Follow these steps exactly:
+
+                            1. **Language**  
+                            Respond **only** in the language specified by `{language}`.
+
+                            2. **Summary**  
+                            First, give a very concise paragraph summarizing the transcript in `{language}`.
+
+                            3. **Key Points**  
+                            - Automatically translate the phrase “Key Points” into `{language}` and use that as your heading.  
+                            - Under that heading, list the most important takeaways as bullet points—in `{language}`.
+
+                            4. **No Extras**  
+                            Do not include any additional commentary, explanations, or formatting beyond the summary paragraph, the translated heading, and the bullet list.
+
+                            **Transcript:**  
+                            {trans}
+                            """
             },
         ])
 
