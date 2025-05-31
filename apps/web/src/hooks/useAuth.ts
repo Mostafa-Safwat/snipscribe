@@ -59,15 +59,10 @@ export const useAuth = () => {
         }
     };
 
-    const handleInitUser = (user: UserDto, loginProvider: LoginProvider, redirectUrl?: string) => {
+    const handleInitUser = async (user: UserDto, loginProvider: LoginProvider, redirectUrl: string) => {
         dispatch(initUser({ user, loginProvider, redirectUrl }));
 
-        if (redirectUrl) {
-            navigate(redirectUrl);
-            return;
-        }
-
-        navigate(`/home`);
+        navigate(redirectUrl);
         toast.success('Welcome back!');
     };
 

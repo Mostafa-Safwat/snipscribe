@@ -63,13 +63,15 @@ const handle40x = async (context: any) => {
 };
 
 const handle401 = async (context: ResponseContext & { init: RequestInitWithRetries }) => {
+    const pathname = `${window.location.pathname}`;
     if (context.init.retries && context.init.retries >= 2) {
         if (context.url.includes('auth/logout')) {
             return;
         }
+
         store.dispatch(logout());
 
-        window.location.href = '/login';
+        window.location.href = `/login?redirect=${pathname}`;
 
         const { logout: apiLogout } = authService();
         await apiLogout();

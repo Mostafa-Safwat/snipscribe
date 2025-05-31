@@ -29,9 +29,9 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(JwtRefreshAuthGuard)
     async refreshAccessToken(@Req() req: RequestWithUser) {
-        const { token } = this.authService.getCookieWithJWT({ userId: req.user.id });
+        const { cookie } = this.authService.getCookieWithJWT({ userId: req.user.id });
 
-        this.setLoginCookies(req, { accessTokenCookie: token, refreshTokenCookie: req.cookies.Refresh });
+        this.setLoginCookies(req, { accessTokenCookie: cookie, refreshTokenCookie: req.cookies.Refresh });
 
         return true;
     }

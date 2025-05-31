@@ -14,7 +14,7 @@ const Login: React.FC = () => {
         if (user) {
             navigate('/home');
         }
-    }, [user, navigate]);
+    }, []);
 
     return (
         <Container component="main" maxWidth="xs">
