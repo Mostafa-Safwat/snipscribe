@@ -2,8 +2,10 @@ import React from 'react';
 import { Paper, Typography, Box, Divider, useTheme } from '@mui/material';
 import ReactPlayer from 'react-player';
 import { SummaryProps } from './types';
+import SummaryShareToggle from './SummaryShareToggle';
+import Markdown from 'react-markdown';
 
-const Summary: React.FC<SummaryProps> = ({ title, videoUrl, summaryText, language }) => {
+const Summary: React.FC<SummaryProps> = ({ id, title, videoUrl, summaryText, language, isShared }) => {
     const theme = useTheme();
 
     return (
@@ -17,20 +19,27 @@ const Summary: React.FC<SummaryProps> = ({ title, videoUrl, summaryText, languag
                 border: `1px solid ${theme.palette.divider}`,
             }}
         >
-            <Typography
-                variant="h5"
-                fontWeight="600"
-                color="primary"
-                gutterBottom
-                sx={{
-                    mb: 2,
-                    borderLeft: `4px solid ${theme.palette.primary.main}`,
-                    pl: 2,
-                    py: 0.5,
-                }}
-            >
-                {title}
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Box>
+                    <Typography
+                        variant="h5"
+                        fontWeight="600"
+                        color="primary"
+                        gutterBottom
+                        sx={{
+                            mb: 2,
+                            borderLeft: `4px solid ${theme.palette.primary.main}`,
+                            pl: 2,
+                            py: 0.5,
+                        }}
+                    >
+                        {title}
+                    </Typography>
+                </Box>
+                <Box>
+                    <SummaryShareToggle id={id} isShared={isShared} />
+                </Box>
+            </Box>
 
             <Divider sx={{ mb: 3 }} />
 
@@ -78,9 +87,14 @@ const Summary: React.FC<SummaryProps> = ({ title, videoUrl, summaryText, languag
                     border: `1px solid ${theme.palette.divider}`,
                     whiteSpace: 'pre-wrap',
                     direction: language === 'Arabic' ? 'rtl' : 'ltr',
+                    '& ul, & ol': {
+                        listStylePosition: 'inside',
+                    },
                 }}
             >
-                {summaryText}
+                <Typography component="div">
+                    <Markdown>{summaryText}</Markdown>
+                </Typography>
             </Box>
         </Paper>
     );

@@ -11,6 +11,7 @@ const SummaryOverview: React.FC = () => {
     const [videoUrl, setVideoUrl] = useState<string>();
     const [summaryText, setSummaryText] = useState<string>();
     const [language, setLanguage] = useState<string>();
+    const [isShared, setIsShared] = useState<boolean>(false);
 
     const { summaryId } = useParams();
 
@@ -23,6 +24,7 @@ const SummaryOverview: React.FC = () => {
                 setTitle(summary.title);
                 setVideoUrl(summary.video?.url);
                 setSummaryText(summary.body);
+                setIsShared(summary.isShared);
                 setLanguage(summary.summaryRequest?.language);
             } else {
                 navigate('/404');
@@ -42,10 +44,12 @@ const SummaryOverview: React.FC = () => {
                 Summary Overview
             </Typography>
             <Summary
+                id={Number(summaryId)}
                 title={title || ''}
                 videoUrl={videoUrl || ''}
                 summaryText={summaryText || ''}
                 language={language || ''}
+                isShared={isShared}
             />
         </Box>
     );
