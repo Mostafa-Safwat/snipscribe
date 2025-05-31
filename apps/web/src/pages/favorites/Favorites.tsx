@@ -1,20 +1,19 @@
 import React, { useEffect } from 'react';
-import { Typography, Box, Button, Grid2 as Grid } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Typography, Box, Grid2 as Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import MiniSummaryCard from '@/components/summary/MiniSummaryCard';
-import { summaryService } from '@/services/summary.service';
 import { SummaryDto } from '@snipscribe/typescript-client';
+import { favoriteService } from '@/services/favorite.service';
 
-const Home: React.FC = () => {
+const Favorites: React.FC = () => {
     const navigate = useNavigate();
 
     const [summaries, setSummaries] = React.useState<SummaryDto[]>([]);
 
     const fetchSummaries = async () => {
-        const { getOwnSummaries } = summaryService();
+        const { getFavorites } = favoriteService();
 
-        const summariesRes = await getOwnSummaries();
+        const summariesRes = await getFavorites();
         setSummaries(summariesRes.summaries);
     };
 
@@ -26,28 +25,21 @@ const Home: React.FC = () => {
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h4" gutterBottom>
-                    Home
+                    Favorites
                 </Typography>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<Add />}
-                    onClick={() => navigate('/new-summary-request')}
-                >
-                    New Summary Request
-                </Button>
             </Box>
             <Box>
                 <Grid container spacing={3}>
-                    {summaries.map((summary, idx) => (
-                        <Grid key={idx} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                    {summaries.map(summary => (
+                        <Grid key={summary.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                             <MiniSummaryCard
                                 id={summary.id}
                                 summaryText={summary.body}
                                 title={summary.title}
                                 language={summary.summaryRequest?.language || 'English'}
-                                isInFavorites={!!summary.favorites?.length}
+                                isInFavorites={true}
                                 onClick={() => navigate(`/summary/${summary.id}`)}
+                                onFavorite={() => fetchSummaries()}
                             />
                         </Grid>
                     ))}
@@ -57,4 +49,4 @@ const Home: React.FC = () => {
     );
 };
 
-export default Home;
+export default Favorites;

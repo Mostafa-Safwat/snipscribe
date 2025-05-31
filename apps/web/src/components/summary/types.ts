@@ -6,10 +6,12 @@ export interface SummaryProps {
 }
 
 export interface MiniSummaryCardProps {
+    id: number;
     title: string;
     summaryText: string;
     language: string;
+    isInFavorites: boolean;
     onClick?: () => void;
-    onLike?: () => void;
+    onFavorite?: () => void;
     onShare?: () => void;
 }

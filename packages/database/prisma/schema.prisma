@@ -130,6 +130,7 @@ model Favorite {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   summary Summary @relation(fields: [summaryId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, summaryId])
   @@map("favorites")
 }
 

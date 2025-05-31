@@ -3,6 +3,7 @@ import MainLayout from '@/layouts/MainLayout';
 import Register from '@/pages/register/Register';
 import NewSummaryRequest from '@/pages/new-summary-request/NewSummaryRequest';
 import SummaryOverview from '@/pages/summary-overview/SummaryOverview';
+import Favorites from '@/pages/favorites/Favorites';
 
 const Login = lazy(() => import('@/pages/login/Login'));
 const Home = lazy(() => import('@/pages/home/Home'));
@@ -48,6 +49,13 @@ const routes: RouteConfig[] = [
         path: '/summary/:summaryId',
         component: SummaryOverview,
         layout: MainLayout,
+        protected: true,
+    },
+    {
+        path: '/favorites',
+        component: Favorites,
+        layout: MainLayout,
+        exact: true,
         protected: true,
     },
     {

@@ -1,5 +1,7 @@
 import { IsBoolean, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
+import { FavoriteDto } from '@/modules/favorite/types/favorite.dto';
+
 export const Status = {
     PENDING: 'PENDING',
     COMPLETED: 'COMPLETED',
@@ -34,6 +36,7 @@ export class SummaryDto {
     createdAt: Date;
     isShared: boolean;
 
+    favorites?: FavoriteDto[];
     summaryRequest?: SummaryRequestDto;
     video?: VideoDto;
 }

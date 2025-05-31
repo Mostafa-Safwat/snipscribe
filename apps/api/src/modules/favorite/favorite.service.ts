@@ -1,0 +1,142 @@
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Status } from '@snipscribe/database';
+
+import { PrismaService } from '@/prisma.service';
+
+@Injectable()
+export class FavoriteService {
+    private readonly logger = new Logger(FavoriteService.name);
+
+    constructor(private readonly prisma: PrismaService) {}
+
+    async getUserFavorites({ userId }: { userId: number }) {
+        const favorites = await this.prisma.favorite.findMany({
+            orderBy: {
+                summaryId: 'desc',
+            },
+            where: {
+                userId,
+                summary: {
+                    status: Status.COMPLETED,
+                    OR: [{ summaryRequest: { userId } }, { isShared: true }],
+                },
+            },
+            include: {
+                summary: {
+                    include: {
+                        video: true,
+                        summaryRequest: true,
+                    },
+                },
+            },
+        });
+
+        const size = await this.prisma.favorite.count({
+            where: {
+                userId,
+                summary: {
+                    status: Status.COMPLETED,
+                    isShared: true,
+                },
+            },
+        });
+
+        console.log('Favorites:', favorites);
+
+        const summaries = favorites.map(favorite => favorite.summary);
+
+        return { summaries, size };
+    }
+
+    async addToFavorites({ id, userId }: { id: number; userId: number }) {
+        const summary = await this.prisma.summary.findUnique({
+            where: {
+                id,
+            },
+            include: {
+                summaryRequest: true,
+            },
+        });
+
+        if (
+            !summary ||
+            summary.status !== Status.COMPLETED ||
+            (summary.summaryRequest.userId !== userId && !summary.isShared)
+        ) {
+            throw new NotFoundException('Summary not found');
+        }
+
+        const existingFavorite = await this.prisma.favorite.findUnique({
+            where: {
+                userId_summaryId: {
+                    summaryId: summary.id,
+                    userId,
+                },
+            },
+        });
+
+        if (existingFavorite) {
+            throw new BadRequestException('Summary is already in favorites');
+        }
+
+        const favorite = await this.prisma.favorite.create({
+            data: {
+                summary: {
+                    connect: {
+                        id: summary.id,
+                    },
+                },
+                user: {
+                    connect: {
+                        id: userId,
+                    },
+                },
+            },
+        });
+
+        return favorite;
+    }
+
+    async removeFromFavorites({ id, userId }: { id: number; userId: number }) {
+        const summary = await this.prisma.summary.findUnique({
+            where: {
+                id,
+            },
+            include: {
+                summaryRequest: true,
+            },
+        });
+
+        if (
+            !summary ||
+            summary.status !== Status.COMPLETED ||
+            (summary.summaryRequest.userId !== userId && !summary.isShared)
+        ) {
+            throw new NotFoundException('Summary not found');
+        }
+
+        const existingFavorite = await this.prisma.favorite.findUnique({
+            where: {
+                userId_summaryId: {
+                    summaryId: summary.id,
+                    userId,
+                },
+            },
+        });
+
+        if (!existingFavorite) {
+            throw new BadRequestException('Summary is not in favorites');
+        }
+
+        const favorite = await this.prisma.favorite.delete({
+            where: {
+                userId_summaryId: {
+                    summaryId: summary.id,
+                    userId,
+                },
+            },
+        });
+
+        return favorite;
+    }
+}

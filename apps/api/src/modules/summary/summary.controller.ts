@@ -12,6 +12,7 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Status } from '@snipscribe/database';
 
 import { AuthorizationGuard } from '@/common/guards/authorization.guard';
 
@@ -39,8 +40,8 @@ export class SummaryController {
     }
 
     @Get('public')
-    async getPublicSummaries(): Promise<GetSummariesResponse> {
-        return this.summaryService.getPublicSummaries();
+    async getPublicSummaries(@Req() { user }: RequestWithUser): Promise<GetSummariesResponse> {
+        return this.summaryService.getPublicSummaries({ userId: user.id });
     }
 
     @Get(':summaryId')
@@ -50,11 +51,11 @@ export class SummaryController {
     ): Promise<SummaryDto> {
         const summary = await this.summaryService.getById({ id: summaryId, userId: user.id });
 
-        if (!summary) {
-            throw new NotFoundException('Summary not found');
-        }
-
-        if (summary.summaryRequest.userId !== user.id && !summary.isShared) {
+        if (
+            !summary ||
+            summary.status !== Status.COMPLETED ||
+            (summary.summaryRequest.userId !== user.id && !summary.isShared)
+        ) {
             throw new NotFoundException('Summary not found');
         }
 

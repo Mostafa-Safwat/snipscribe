@@ -1,20 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardActionArea, CardActions, Typography, Box, IconButton, useTheme } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ShareIcon from '@mui/icons-material/Share';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { MiniSummaryCardProps } from './types';
+import { favoriteService } from '@/services/favorite.service';
+import { toast } from 'react-toastify';
 
 const MiniSummaryCard: React.FC<MiniSummaryCardProps> = ({
+    id,
     title,
     summaryText,
     language,
+    isInFavorites,
     onClick,
-    onLike,
+    onFavorite,
     onShare,
 }) => {
     const theme = useTheme();
 
+    const [favorite, setFavorite] = useState(isInFavorites);
+    const [submitting, setSubmitting] = useState(false);
+
     const preview = summaryText.length > 100 ? `${summaryText.slice(0, 100)}...` : summaryText;
+
+    const handleFavorite = async () => {
+        if (submitting) return;
+
+        const { addSummaryToFavorites, removeSummaryFromFavorites } = favoriteService();
+
+        setSubmitting(true);
+
+        if (favorite) {
+            await removeSummaryFromFavorites({ summaryId: id });
+
+            toast.success('Summary removed from favorites');
+        } else {
+            await addSummaryToFavorites({ summaryId: id });
+
+            toast.success('Summary added to favorites');
+        }
+
+        setFavorite(!favorite);
+
+        if (onFavorite) {
+            onFavorite();
+        }
+
+        setSubmitting(false);
+    };
+
+    const handleShare = () => {
+        if (onShare) {
+            onShare();
+        } else {
+            const rootUrl = window.location.origin;
+            const summaryUrl = `${rootUrl}/summary/${id}`;
+            navigator.clipboard.writeText(summaryUrl);
+            toast.success('Link copied to clipboard');
+        }
+    };
 
     return (
         <Card
@@ -60,10 +105,14 @@ const MiniSummaryCard: React.FC<MiniSummaryCardProps> = ({
 
             <CardActions sx={{ justifyContent: 'space-between', px: 1, pb: 1 }}>
                 <Box>
-                    <IconButton aria-label="like" onClick={onLike} size="small">
-                        <FavoriteBorderIcon fontSize="small" />
+                    <IconButton aria-label="like" size="small" onClick={handleFavorite} disabled={submitting}>
+                        {favorite ? (
+                            <FavoriteIcon fontSize="small" color="primary" />
+                        ) : (
+                            <FavoriteBorderIcon fontSize="small" />
+                        )}
                     </IconButton>
-                    <IconButton aria-label="share" onClick={onShare} size="small">
+                    <IconButton aria-label="share" onClick={handleShare} size="small">
                         <ShareIcon fontSize="small" />
                     </IconButton>
                 </Box>

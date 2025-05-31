@@ -35,6 +35,11 @@ export class SummaryService {
             include: {
                 video: true,
                 summaryRequest: true,
+                favorites: {
+                    where: {
+                        userId,
+                    },
+                },
             },
         });
         const size = await this.prisma.summaryRequest.count({
@@ -46,7 +51,7 @@ export class SummaryService {
         return { summaries, size };
     }
 
-    async getPublicSummaries() {
+    async getPublicSummaries({ userId }: { userId: number }) {
         const summaries = await this.prisma.summary.findMany({
             orderBy: {
                 id: 'desc',
@@ -57,6 +62,11 @@ export class SummaryService {
             include: {
                 notes: true,
                 video: true,
+                favorites: {
+                    where: {
+                        userId,
+                    },
+                },
             },
         });
         const size = await this.prisma.summary.count({
@@ -69,12 +79,6 @@ export class SummaryService {
     }
 
     async getById({ id, userId }: { id: number; userId: number }) {
-        const user = await this.userService.getById({ id: userId });
-
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-
         const summary = await this.prisma.summary.findUnique({
             where: {
                 id,
@@ -82,6 +86,11 @@ export class SummaryService {
             include: {
                 video: true,
                 summaryRequest: true,
+                favorites: {
+                    where: {
+                        userId,
+                    },
+                },
             },
         });
 
