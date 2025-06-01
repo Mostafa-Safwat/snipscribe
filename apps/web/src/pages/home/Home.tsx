@@ -14,7 +14,7 @@ const Home: React.FC = () => {
     const fetchSummaries = async () => {
         const { getOwnSummaries } = summaryService();
 
-        const summariesRes = await getOwnSummaries();
+        const summariesRes = await getOwnSummaries({ skip: 0, take: 5 });
         setSummaries(summariesRes.summaries);
     };
 

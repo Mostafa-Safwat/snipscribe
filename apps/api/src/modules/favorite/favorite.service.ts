@@ -41,8 +41,6 @@ export class FavoriteService {
             },
         });
 
-        console.log('Favorites:', favorites);
-
         const summaries = favorites.map(favorite => favorite.summary);
 
         return { summaries, size };
@@ -94,6 +92,17 @@ export class FavoriteService {
             },
         });
 
+        await this.prisma.summary.update({
+            where: {
+                id: summary.id,
+            },
+            data: {
+                noOfFavorites: {
+                    increment: 1,
+                },
+            },
+        });
+
         return favorite;
     }
 
@@ -133,6 +142,17 @@ export class FavoriteService {
                 userId_summaryId: {
                     summaryId: summary.id,
                     userId,
+                },
+            },
+        });
+
+        await this.prisma.summary.update({
+            where: {
+                id: summary.id,
+            },
+            data: {
+                noOfFavorites: {
+                    decrement: 1,
                 },
             },
         });

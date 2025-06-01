@@ -15,7 +15,13 @@ export class SummaryService {
         private readonly userService: UserService
     ) {}
 
-    async getUserSummaries({ userId }: { userId: number }) {
+    async getUserSummaries({
+        userId,
+        params,
+    }: {
+        userId: number;
+        params: { skip?: number; take?: number; search?: string };
+    }) {
         const user = await this.userService.getById({ id: userId });
 
         if (!user) {
@@ -31,7 +37,25 @@ export class SummaryService {
                     userId,
                 },
                 status: 'COMPLETED',
+                ...(params.search && {
+                    OR: [
+                        {
+                            title: {
+                                contains: params.search,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            body: {
+                                contains: params.search,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                }),
             },
+            skip: params.skip,
+            take: params.take,
             include: {
                 video: true,
                 summaryRequest: true,
@@ -42,23 +66,72 @@ export class SummaryService {
                 },
             },
         });
-        const size = await this.prisma.summaryRequest.count({
+        const size = await this.prisma.summary.count({
             where: {
-                userId,
+                summaryRequest: {
+                    userId,
+                },
+                status: 'COMPLETED',
+                ...(params.search && {
+                    OR: [
+                        {
+                            title: {
+                                contains: params.search,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            body: {
+                                contains: params.search,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                }),
             },
         });
 
         return { summaries, size };
     }
 
-    async getPublicSummaries({ userId }: { userId: number }) {
+    async getPublicSummaries({
+        userId,
+        params,
+    }: {
+        userId: number;
+        params: { skip?: number; take?: number; search?: string };
+    }) {
         const summaries = await this.prisma.summary.findMany({
-            orderBy: {
-                id: 'desc',
-            },
+            orderBy: [
+                {
+                    noOfFavorites: 'desc',
+                },
+                {
+                    createdAt: 'desc',
+                },
+            ],
             where: {
                 isShared: true,
+                status: 'COMPLETED',
+                ...(params.search && {
+                    OR: [
+                        {
+                            title: {
+                                contains: params.search,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            body: {
+                                contains: params.search,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                }),
             },
+            skip: params.skip,
+            take: params.take,
             include: {
                 notes: true,
                 video: true,
@@ -72,6 +145,23 @@ export class SummaryService {
         const size = await this.prisma.summary.count({
             where: {
                 isShared: true,
+                status: 'COMPLETED',
+                ...(params.search && {
+                    OR: [
+                        {
+                            title: {
+                                contains: params.search,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            body: {
+                                contains: params.search,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                }),
             },
         });
 

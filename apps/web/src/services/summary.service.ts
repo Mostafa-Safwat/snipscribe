@@ -1,6 +1,8 @@
 import {
     CreateSummaryRequest,
+    GetPublicSummariesRequest,
     GetSummaryRequest,
+    GetUserSummariesRequest,
     SummariesApi,
     UpdateSummaryRequest,
 } from '@snipscribe/typescript-client';
@@ -22,12 +24,12 @@ export function summaryService() {
         return await summariesApiClient.getSummary(params);
     }
 
-    async function getPublicSummaries() {
-        return await summariesApiClient.getPublicSummaries();
+    async function getPublicSummaries(params: GetPublicSummariesRequest) {
+        return await summariesApiClient.getPublicSummaries(params);
     }
 
-    async function getOwnSummaries() {
-        return await summariesApiClient.getUserSummaries();
+    async function getOwnSummaries(params: GetUserSummariesRequest) {
+        return await summariesApiClient.getUserSummaries(params);
     }
 
     return {

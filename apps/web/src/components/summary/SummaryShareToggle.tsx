@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Switch, Typography } from '@mui/material';
 import { summaryService } from '@/services/summary.service';
 import { ShareToggleProps } from './types';
@@ -7,6 +7,11 @@ import { toast } from 'react-toastify';
 const SummaryShareToggle: React.FC<ShareToggleProps> = ({ sx, id, isShared }) => {
     const [shared, setShared] = useState(isShared);
     const [submitting, setSubmitting] = useState(false);
+
+    // Sync `shared` state with `isShared` prop whenever `isShared` changes
+    useEffect(() => {
+        setShared(isShared);
+    }, [isShared]);
 
     const handleToggleShare = async () => {
         if (submitting) return;

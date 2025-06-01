@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsBoolean, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 import { FavoriteDto } from '@/modules/favorite/types/favorite.dto';
@@ -11,12 +13,12 @@ export const Status = {
 
 export type Status = (typeof Status)[keyof typeof Status];
 
-export const Type = {
+export const VideoType = {
     YOUTUBE: 'YOUTUBE',
     FILE: 'FILE',
 };
 
-export type Type = (typeof Type)[keyof typeof Type];
+export type VideoType = (typeof VideoType)[keyof typeof VideoType];
 
 export class SummaryRequestDto {
     id: number;
@@ -43,7 +45,7 @@ export class SummaryDto {
 
 export class VideoDto {
     id: number;
-    type: Type;
+    type: VideoType;
     url: string;
     createdAt: Date;
 
@@ -70,4 +72,17 @@ export class UpdateSummaryDto {
 export class GetSummariesResponse {
     summaries: SummaryDto[];
     size: number;
+}
+
+export class GetSummariesQuery {
+    @ApiProperty({ required: false })
+    @Type(() => Number)
+    skip?: number;
+
+    @ApiProperty({ required: false })
+    @Type(() => Number)
+    take?: number;
+
+    @ApiProperty({ required: false })
+    search?: string;
 }

@@ -7,6 +7,7 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    Query,
     Req,
     UseGuards,
     ValidationPipe,
@@ -21,6 +22,7 @@ import { RequestWithUser } from '../auth/types/auth.dto';
 import { SummaryService } from './summary.service';
 import {
     CreateSummaryRequestDto,
+    GetSummariesQuery,
     GetSummariesResponse,
     SummaryDto,
     SummaryRequestDto,
@@ -35,13 +37,19 @@ export class SummaryController {
     constructor(private readonly summaryService: SummaryService) {}
 
     @Get()
-    async getUserSummaries(@Req() { user }: RequestWithUser): Promise<GetSummariesResponse> {
-        return this.summaryService.getUserSummaries({ userId: user.id });
+    async getUserSummaries(
+        @Req() { user }: RequestWithUser,
+        @Query() { skip, take, search }: GetSummariesQuery
+    ): Promise<GetSummariesResponse> {
+        return this.summaryService.getUserSummaries({ userId: user.id, params: { skip, take, search } });
     }
 
     @Get('public')
-    async getPublicSummaries(@Req() { user }: RequestWithUser): Promise<GetSummariesResponse> {
-        return this.summaryService.getPublicSummaries({ userId: user.id });
+    async getPublicSummaries(
+        @Req() { user }: RequestWithUser,
+        @Query() { skip, take, search }: GetSummariesQuery
+    ): Promise<GetSummariesResponse> {
+        return this.summaryService.getPublicSummaries({ userId: user.id, params: { skip, take, search } });
     }
 
     @Get(':summaryId')

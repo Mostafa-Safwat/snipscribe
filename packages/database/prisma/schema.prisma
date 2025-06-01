@@ -73,6 +73,7 @@ model Summary {
   createdAt        DateTime @default(now()) @map("created_at")
   videoId          Int      @unique @map("video_id")
   isShared         Boolean  @default(false) @map("is_shared")
+  noOfFavorites    Int      @default(0) @map("no_of_favorites")
 
   summaryRequest SummaryRequest @relation(fields: [summaryRequestId], references: [id], onDelete: Cascade)
   video          Video          @relation(fields: [videoId], references: [id])

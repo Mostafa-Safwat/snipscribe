@@ -1,13 +1,14 @@
-import { lazy, ComponentType } from 'react';
+import { ComponentType } from 'react';
 import MainLayout from '@/layouts/MainLayout';
 import Register from '@/pages/register/Register';
 import NewSummaryRequest from '@/pages/new-summary-request/NewSummaryRequest';
 import SummaryOverview from '@/pages/summary-overview/SummaryOverview';
 import Favorites from '@/pages/favorites/Favorites';
-
-const Login = lazy(() => import('@/pages/login/Login'));
-const Home = lazy(() => import('@/pages/home/Home'));
-const NotFound = lazy(() => import('@/pages/not-found/NotFound'));
+import History from '@/pages/history/History';
+import Home from '@/pages/home/Home';
+import Login from '@/pages/login/Login';
+import NotFound from '@/pages/not-found/NotFound';
+import Discover from '@/pages/discover/Discover';
 
 export interface RouteConfig {
     path: string;
@@ -49,6 +50,20 @@ const routes: RouteConfig[] = [
         path: '/summary/:summaryId',
         component: SummaryOverview,
         layout: MainLayout,
+        protected: true,
+    },
+    {
+        path: '/history',
+        component: History,
+        layout: MainLayout,
+        exact: true,
+        protected: true,
+    },
+    {
+        path: '/discover',
+        component: Discover,
+        layout: MainLayout,
+        exact: true,
         protected: true,
     },
     {
