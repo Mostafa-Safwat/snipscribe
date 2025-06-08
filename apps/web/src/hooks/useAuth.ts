@@ -12,6 +12,7 @@ import {
 import { toast } from 'react-toastify';
 import { UserDto } from '@snipscribe/typescript-client';
 import { LoginProvider } from '@/types/enums';
+import { clearRedirectPath } from '@/store/slices/redirectPathSlice';
 
 interface User {
     id: string;
@@ -43,6 +44,7 @@ export const useAuth = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const auth = useAppSelector(state => state.auth);
+    const redirectPath = useAppSelector(state => state.redirectPath);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -59,10 +61,13 @@ export const useAuth = () => {
         }
     };
 
-    const handleInitUser = async (user: UserDto, loginProvider: LoginProvider, redirectUrl: string) => {
-        dispatch(initUser({ user, loginProvider, redirectUrl }));
+    const handleInitUser = async (user: UserDto, loginProvider: LoginProvider) => {
+        dispatch(initUser({ user, loginProvider }));
 
-        navigate(redirectUrl);
+        const target = redirectPath?.length ? redirectPath : '/home';
+        dispatch(clearRedirectPath());
+
+        navigate(target, { replace: true });
         toast.success('Welcome back!');
     };
 

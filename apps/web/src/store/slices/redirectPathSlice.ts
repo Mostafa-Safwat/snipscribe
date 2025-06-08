@@ -6,7 +6,7 @@ const redirectPathSlice = createSlice({
     name: 'redirectPath',
     initialState,
     reducers: {
-        setRedirectPath: (state, action: PayloadAction<string>) => action.payload,
+        setRedirectPath: (_state, action: PayloadAction<string>) => action.payload,
         clearRedirectPath: () => '',
     },
 });

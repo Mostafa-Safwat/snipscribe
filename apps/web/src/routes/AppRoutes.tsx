@@ -1,12 +1,28 @@
-import React, { Suspense } from 'react';
-import { Route, Routes, Navigate } from 'react-router-dom';
+// AppRoutes.tsx
+import React, { Suspense, useEffect } from 'react';
+import { Route, Routes, Navigate, useLocation, matchPath } from 'react-router-dom';
 import routes from './routeConfig';
 import { useAuth } from '@/hooks/useAuth';
 import { AnimatePresence } from 'framer-motion';
 import LoadingFallback from '@/components/common/LoadingFallback';
+import { useDispatch } from 'react-redux';
+import { setRedirectPath } from '@/store/slices/redirectPathSlice';
 
 const AppRoutes: React.FC = () => {
     const { user } = useAuth();
+    const dispatch = useDispatch();
+    const location = useLocation();
+
+    useEffect(() => {
+        const protectedRoute = routes.find(route => {
+            if (!route.protected) return false;
+            return matchPath({ path: route.path, end: true }, location.pathname);
+        });
+
+        if (protectedRoute) {
+            dispatch(setRedirectPath(location.pathname + location.search));
+        }
+    }, [location]);
 
     return (
         <Suspense fallback={<LoadingFallback />}>

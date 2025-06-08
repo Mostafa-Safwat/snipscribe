@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Alert, Collapse } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { Formik, Form } from 'formik';
-import { useLocation } from 'react-router-dom';
 import FormTextField from '@/components/form/FormTextField';
 import PasswordField from '@/components/form/PasswordField';
 import { loginValidationSchema } from './validationSchema';
@@ -17,12 +16,8 @@ interface LoginFormValues {
 
 const LoginForm: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
-    const location = useLocation();
     const { initUser } = useAuth();
     const auth = authService();
-
-    const searchParams = new URLSearchParams(location.search);
-    const redirectUrl = searchParams.get('redirect') || '/home';
 
     const initialValues: LoginFormValues = {
         email: '',
@@ -44,7 +39,7 @@ const LoginForm: React.FC = () => {
             });
 
             if (user) {
-                initUser(user, LoginProvider.LOCAL, redirectUrl);
+                initUser(user, LoginProvider.LOCAL);
             } else {
                 throw new Error('Login failed. Please check your credentials and try again.');
             }
