@@ -9,6 +9,8 @@ import Home from '@/pages/home/Home';
 import Login from '@/pages/login/Login';
 import NotFound from '@/pages/not-found/NotFound';
 import Discover from '@/pages/discover/Discover';
+import UserSettings from '@/pages/user-settings/UserSettings';
+import Landing from '@/pages/landing/Landing';
 
 export interface RouteConfig {
     path: string;
@@ -21,13 +23,19 @@ export interface RouteConfig {
 
 const routes: RouteConfig[] = [
     {
-        path: '/login',
+        path: '/',
+        component: Landing,
+        exact: true,
+        protected: false,
+    },
+    {
+        path: '/signin',
         component: Login,
         exact: true,
         protected: false,
     },
     {
-        path: '/register',
+        path: '/signup',
         component: Register,
         exact: true,
         protected: false,
@@ -69,6 +77,13 @@ const routes: RouteConfig[] = [
     {
         path: '/favorites',
         component: Favorites,
+        layout: MainLayout,
+        exact: true,
+        protected: true,
+    },
+    {
+        path: '/settings',
+        component: UserSettings,
         layout: MainLayout,
         exact: true,
         protected: true,

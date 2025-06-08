@@ -1,38 +1,38 @@
-import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { Suspense } from "react";
-import { CircularProgress, Box } from "@mui/material";
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { Suspense } from 'react';
+import { CircularProgress, Box } from '@mui/material';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user } = useAuth();
-  const location = useLocation();
+    const { user } = useAuth();
+    const location = useLocation();
 
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+    if (!user) {
+        return <Navigate to="/signin" state={{ from: location }} replace />;
+    }
 
-  return (
-    <Suspense
-      fallback={
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh",
-          }}
+    return (
+        <Suspense
+            fallback={
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100vh',
+                    }}
+                >
+                    <CircularProgress />
+                </Box>
+            }
         >
-          <CircularProgress />
-        </Box>
-      }
-    >
-      {children}
-    </Suspense>
-  );
+            {children}
+        </Suspense>
+    );
 };
 
 export default ProtectedRoute;

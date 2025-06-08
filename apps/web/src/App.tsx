@@ -7,8 +7,8 @@ import { ThemeProvider } from './theme/ThemeProvider';
 import { AuthProvider } from './auth/AuthProvider';
 import AppRoutes from './routes/AppRoutes';
 import CircularProgress from '@mui/material/CircularProgress';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import StyledToaster from './components/common/StyledToaster';
 
 const App: React.FC = () => {
     return (
@@ -18,7 +18,7 @@ const App: React.FC = () => {
                     <AuthProvider>
                         <BrowserRouter>
                             <AppRoutes />
-                            <ToastContainer position="top-right" autoClose={5000} />
+                            <StyledToaster position="top-right" autoClose={5000} />
                         </BrowserRouter>
                     </AuthProvider>
                 </ThemeProvider>

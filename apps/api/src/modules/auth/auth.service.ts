@@ -6,7 +6,6 @@ import crypto from 'crypto';
 import { PrismaService } from '@/prisma.service';
 import { comparePassword } from '@/utils/password';
 
-import { UserDto } from '../user/types/user.dto';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './types/auth.dto';
 

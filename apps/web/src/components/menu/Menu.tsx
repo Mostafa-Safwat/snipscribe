@@ -13,8 +13,10 @@ import {
 import Logout from '@mui/icons-material/Logout';
 import ThemeToggle from '../common/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const Menu = () => {
+    const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const { user, logout } = useAuth();
@@ -31,6 +33,11 @@ const Menu = () => {
 
     const handleLogout = () => {
         logout();
+        handleClose();
+    };
+
+    const handleSettings = () => {
+        navigate('/settings');
         handleClose();
     };
 
@@ -94,7 +101,7 @@ const Menu = () => {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-                <MenuItem onClick={handleClose}>My account</MenuItem>
+                <MenuItem onClick={handleSettings}>My account</MenuItem>
                 <ListItem>
                     <ThemeToggle />
                 </ListItem>

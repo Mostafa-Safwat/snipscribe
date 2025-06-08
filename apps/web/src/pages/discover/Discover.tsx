@@ -6,6 +6,8 @@ import { summaryService } from '@/services/summary.service';
 import { SummaryDto } from '@snipscribe/typescript-client';
 import SearchBar from '@/components/common/SearchBar';
 import InfiniteScroll from '@/components/infinite-scroll/InfiniteScroll';
+import NoSummariesFound from '@/components/summary/NoSummariesFound';
+import EndOfSummaries from '@/components/common/EndOfSummaries';
 
 const Discover: React.FC = () => {
     const navigate = useNavigate();
@@ -56,39 +58,35 @@ const Discover: React.FC = () => {
                     <SearchBar onSearch={query => setSearch(query)} />
                 </Box>
             </Box>
-            <InfiniteScroll
-                loadMore={loadMoreSummaries}
-                hasMore={hasMore}
-                loader={
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                        <CircularProgress />
-                    </Box>
-                }
-                endMessage={
-                    <Typography
-                        variant="body2"
-                        align="center"
-                        sx={{ mt: 2, color: 'text.secondary', fontWeight: 'bold' }}
-                    >
-                        You've seen it all!
-                    </Typography>
-                }
-            >
-                <Grid container spacing={3}>
-                    {summaries.map(summary => (
-                        <Grid key={summary.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                            <MiniSummaryCard
-                                id={summary.id}
-                                summaryText={summary.body}
-                                title={summary.title}
-                                language={summary.summaryRequest?.language || 'English'}
-                                isInFavorites={!!summary.favorites?.length}
-                                onClick={() => navigate(`/summary/${summary.id}`)}
-                            />
-                        </Grid>
-                    ))}
-                </Grid>
-            </InfiniteScroll>
+            {summaries.length === 0 && !loading ? (
+                <NoSummariesFound />
+            ) : (
+                <InfiniteScroll
+                    loadMore={loadMoreSummaries}
+                    hasMore={hasMore}
+                    loader={
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                            <CircularProgress />
+                        </Box>
+                    }
+                    endMessage={<EndOfSummaries />}
+                >
+                    <Grid container spacing={3}>
+                        {summaries.map(summary => (
+                            <Grid key={summary.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                                <MiniSummaryCard
+                                    id={summary.id}
+                                    summaryText={summary.body}
+                                    title={summary.title}
+                                    language={summary.summaryRequest?.language || 'English'}
+                                    isInFavorites={!!summary.favorites?.length}
+                                    onClick={() => navigate(`/summary/${summary.id}`)}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
+                </InfiniteScroll>
+            )}
         </Box>
     );
 };

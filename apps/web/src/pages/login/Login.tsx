@@ -66,7 +66,7 @@ const Login: React.FC = () => {
                         </Link>
 
                         <Link
-                            to="/register"
+                            to="/signup"
                             style={{
                                 textDecoration: 'none',
                                 color: theme.palette.primary.main,

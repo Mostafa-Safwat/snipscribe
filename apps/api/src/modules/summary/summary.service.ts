@@ -215,7 +215,7 @@ export class SummaryService {
                         data: videos.map(video => ({
                             videoId: video.id,
                             status: 'PENDING',
-                            isShared: user.userSettings?.sharing || false,
+                            isShared: !!user.userSettings?.sharing,
                         })),
                     },
                 },

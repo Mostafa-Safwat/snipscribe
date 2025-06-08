@@ -11,7 +11,7 @@ import {
 import { AppModule } from './modules/app/app.module';
 import { getLogLevels } from './utils';
 
-const CORS_WHITELIST = ['http://localhost:3001', 'http://localhost:3000'];
+const CORS_WHITELIST = ['http://localhost:3001', 'http://localhost:3000', 'oriented-lively-satyr.ngrok-free.app'];
 const IS_PROD = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 3001;
 async function bootstrap(onlyGenerateSwagger = false) {

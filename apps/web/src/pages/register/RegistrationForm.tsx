@@ -54,7 +54,7 @@ const RegistrationForm: React.FC = () => {
             });
 
             if (user) {
-                initUser(user, LoginProvider.LOCAL);
+                initUser(user, LoginProvider.LOCAL, '/home');
             }
         } catch (err) {
             console.error('Registration error:', err);

@@ -24,6 +24,7 @@ export class UserSeederService implements ISeeder {
                         username: user.username,
                         role: user.role as Role,
                         password: user.password,
+                        userSettings: {},
                     },
                 });
 

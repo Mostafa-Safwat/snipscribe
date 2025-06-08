@@ -1,4 +1,5 @@
 import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { Prisma } from '@snipscribe/database';
 
 import { PrismaService } from '@/prisma.service';
 import { encryptPassword } from '@/utils/password';
@@ -54,6 +55,9 @@ export class UserService {
             where: {
                 email,
             },
+            include: {
+                userSettings: true,
+            },
         });
     }
 
@@ -61,6 +65,14 @@ export class UserService {
         const refreshTokenData = await this.authService.getRefreshToken({ refreshToken });
 
         return refreshTokenData.user;
+    }
+
+    async getUserSettings({ id }: { id: number }) {
+        return this.prisma.userSettings.findUnique({
+            where: {
+                userId: id,
+            },
+        });
     }
 
     async save({ data }: { data: CreateUserDto }) {
@@ -92,11 +104,16 @@ export class UserService {
     }
 
     async update({ id, data }: { id: number; data: UpdateUserDto }) {
+        const userData: Prisma.UserUpdateInput = {};
+        const userSettingsData: Prisma.UserSettingsUpdateInput = {};
+
         if (data.username) {
             const existingUser = await this.getByUsername({ username: data.username });
             if (existingUser && existingUser.id !== id) {
                 throw new BadRequestException(`User with username ${data.username} already exists`);
             }
+
+            userData.username = data.username;
         }
 
         if (data.email) {
@@ -104,10 +121,22 @@ export class UserService {
             if (existingEmail && existingEmail.id !== id) {
                 throw new BadRequestException(`User with email ${data.email} already exists`);
             }
+
+            userData.email = data.email;
         }
 
         if (data.password) {
             data.password = await encryptPassword(data.password);
+
+            userData.password = data.password;
+        }
+
+        if (data.sharing !== undefined) {
+            userSettingsData.sharing = data.sharing;
+        }
+
+        if (data.notifications !== undefined) {
+            userSettingsData.notifications = data.notifications;
         }
 
         const updatedUser = await this.prisma.user.update({
@@ -115,7 +144,10 @@ export class UserService {
                 id,
             },
             data: {
-                ...data,
+                ...userData,
+                userSettings: {
+                    update: userSettingsData,
+                },
             },
         });
 

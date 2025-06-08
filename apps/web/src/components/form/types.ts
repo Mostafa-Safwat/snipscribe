@@ -1,4 +1,4 @@
-import { SelectProps, TextFieldProps } from '@mui/material';
+import { SelectProps, SwitchProps, TextFieldProps } from '@mui/material';
 import { FilePondInitialFile } from 'filepond';
 import { FormikHelpers } from 'formik';
 import { FilePondProps } from 'react-filepond';
@@ -34,13 +34,25 @@ export type FormSelectFieldProps = SelectProps & {
     }[];
 };
 
-export type FormField = FormTextFieldProps | PasswordFieldProps | FileUploadFieldProps | FormSelectFieldProps;
+export type FormToggleFieldProps = Omit<SwitchProps, 'type'> & {
+    name: string;
+    label: string;
+    type: 'toggle';
+    helperText?: string;
+};
+
+export type FormField =
+    | FormTextFieldProps
+    | PasswordFieldProps
+    | FileUploadFieldProps
+    | FormSelectFieldProps
+    | FormToggleFieldProps;
 
 export type FormProps = {
-    initialValues: Record<string, string> & Record<string, unknown>;
+    initialValues: Record<string, any>;
     validation: ObjectSchema<AnyObject>;
     onSubmit: (
-        values: Record<string, string>,
+        values: Record<string, any>,
         formikHelpers: FormikHelpers<Record<string, string>>
     ) => void | Promise<unknown>;
     fields: FormField[];

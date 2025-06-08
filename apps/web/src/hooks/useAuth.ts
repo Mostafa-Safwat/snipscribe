@@ -51,9 +51,9 @@ export const useAuth = () => {
 
     const handleTokenExpired = () => {
         dispatch(refreshTokenIsExpired());
-        if (window.location.pathname !== '/login') {
+        if (window.location.pathname !== '/signin') {
             navigate({
-                pathname: '/login',
+                pathname: '/signin',
                 search: `?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`,
             });
         }

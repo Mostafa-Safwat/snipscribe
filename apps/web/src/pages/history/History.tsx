@@ -5,6 +5,7 @@ import MiniSummaryCard from '@/components/summary/MiniSummaryCard';
 import { summaryService } from '@/services/summary.service';
 import { SummaryDto } from '@snipscribe/typescript-client';
 import InfiniteScroll from '@/components/infinite-scroll/InfiniteScroll';
+import EndOfSummaries from '@/components/common/EndOfSummaries';
 
 const History: React.FC = () => {
     const navigate = useNavigate();
@@ -59,15 +60,7 @@ const History: React.FC = () => {
                         <CircularProgress />
                     </Box>
                 }
-                endMessage={
-                    <Typography
-                        variant="body2"
-                        align="center"
-                        sx={{ mt: 2, color: 'text.secondary', fontWeight: 'bold' }}
-                    >
-                        You've seen it all!
-                    </Typography>
-                }
+                endMessage={<EndOfSummaries />}
             >
                 <Grid container spacing={3}>
                     {summaries.map(summary => (

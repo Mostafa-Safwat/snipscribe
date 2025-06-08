@@ -5,6 +5,7 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [react()],
+    assetsInclude: ['**/*.lottie'],
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
@@ -27,6 +28,7 @@ export default defineConfig({
                 ws: false,
             },
         },
+        allowedHosts: ['localhost', 'oriented-lively-satyr.ngrok-free.app'],
     },
     preview: {
         port: 3000,

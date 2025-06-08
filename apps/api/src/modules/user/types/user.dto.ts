@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export const UserRole = {
     ADMIN: 'ADMIN',
@@ -8,6 +8,13 @@ export const UserRole = {
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
+export class UserSettingsDto {
+    id: number;
+    userId: number;
+    sharing: boolean;
+    notifications: boolean;
+}
+
 export class UserDto {
     id: number;
     email: string;
@@ -15,6 +22,9 @@ export class UserDto {
 
     @ApiProperty({ enum: UserRole, enumName: 'UserRole' })
     role: UserRole;
+
+    @ApiProperty()
+    settings?: UserSettingsDto;
 }
 
 export class CreateUserDto {
@@ -40,6 +50,14 @@ export class UpdateUserDto {
     @IsString()
     @IsOptional()
     password?: string;
+
+    @IsBoolean()
+    @IsOptional()
+    sharing?: boolean;
+
+    @IsBoolean()
+    @IsOptional()
+    notifications?: boolean;
 }
 
 export class GetUsersResponse {

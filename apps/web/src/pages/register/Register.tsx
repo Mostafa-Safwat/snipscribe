@@ -54,7 +54,7 @@ const Register: React.FC = () => {
                         }}
                     >
                         <Link
-                            to="/login"
+                            to="/signin"
                             style={{
                                 textDecoration: 'none',
                                 color: theme.palette.primary.main,

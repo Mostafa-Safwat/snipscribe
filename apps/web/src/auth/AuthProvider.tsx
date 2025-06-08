@@ -18,7 +18,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(DEMO_USER);
     const [loading, setLoading] = useState(false);
 
-    const login = async (email: string, password: string, rememberMe = false): Promise<void> => {
+    const login = async (_email: string, _password: string, rememberMe = false): Promise<void> => {
         setLoading(true);
 
         try {

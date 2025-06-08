@@ -26,15 +26,16 @@ model User {
   favorites       Favorite[]
   summaryRequests SummaryRequest[]
   refreshTokens   RefreshToken[]
+  notifications   Notification[]
 
   @@map("users")
 }
 
 model UserSettings {
-  id           Int     @id @default(autoincrement())
-  userId       Int     @unique @map("user_id")
-  sharing      Boolean @default(false)
-  notification Boolean @default(true)
+  id            Int     @id @default(autoincrement())
+  userId        Int     @unique @map("user_id")
+  sharing       Boolean @default(false)
+  notifications Boolean @default(true)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -80,6 +81,7 @@ model Summary {
   shareableLink  ShareableLink?
   notes          Note[]
   favorites      Favorite[]
+  notification   Notification?
 
   @@map("summaries")
 }
@@ -133,6 +135,18 @@ model Favorite {
 
   @@unique([userId, summaryId])
   @@map("favorites")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  summaryId Int      @unique @map("summary_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  summary Summary @relation(fields: [summaryId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
 
 // Enums

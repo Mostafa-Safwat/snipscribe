@@ -7,6 +7,7 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    Req,
     UseGuards,
     ValidationPipe,
 } from '@nestjs/common';
@@ -18,7 +19,8 @@ import { AllowSelf } from '@/decorators/allow-self.decorator';
 import { AllowedRoles } from '@/decorators/allowed-roles.decorator';
 
 import { JwtAuthGuard } from '../auth/strategies/jwt.strategy';
-import { CreateUserDto, GetUsersResponse, UpdateUserDto, UserDto } from './types/user.dto';
+import { RequestWithUser } from '../auth/types/auth.dto';
+import { CreateUserDto, GetUsersResponse, UpdateUserDto, UserDto, UserSettingsDto } from './types/user.dto';
 import { UserService } from './user.service';
 
 @Controller({ path: 'users', version: '1' })
@@ -32,6 +34,13 @@ export class UserController {
     @AllowedRoles(Role.ADMIN)
     async getUsers(): Promise<GetUsersResponse> {
         return this.userService.getUsers();
+    }
+
+    @Get('settings')
+    @UseGuards(AuthorizationGuard)
+    @UseGuards(JwtAuthGuard)
+    getUserSettings(@Req() { user }: RequestWithUser): Promise<UserSettingsDto> {
+        return this.userService.getUserSettings({ id: user.id });
     }
 
     @Get(':userId')

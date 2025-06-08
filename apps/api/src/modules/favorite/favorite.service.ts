@@ -9,7 +9,13 @@ export class FavoriteService {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    async getUserFavorites({ userId }: { userId: number }) {
+    async getUserFavorites({
+        userId,
+        params,
+    }: {
+        userId: number;
+        params: { skip?: number; take?: number; search?: string };
+    }) {
         const favorites = await this.prisma.favorite.findMany({
             orderBy: {
                 summaryId: 'desc',
@@ -21,6 +27,8 @@ export class FavoriteService {
                     OR: [{ summaryRequest: { userId } }, { isShared: true }],
                 },
             },
+            skip: params.skip,
+            take: params.take,
             include: {
                 summary: {
                     include: {

@@ -1,11 +1,11 @@
-import { Controller, Delete, Get, Param, ParseIntPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { AuthorizationGuard } from '@/common/guards/authorization.guard';
 
 import { JwtAuthGuard } from '../auth/strategies/jwt.strategy';
 import { RequestWithUser } from '../auth/types/auth.dto';
-import { GetSummariesResponse } from '../summary/types/summary.dto';
+import { GetSummariesQuery, GetSummariesResponse } from '../summary/types/summary.dto';
 import { FavoriteService } from './favorite.service';
 
 @Controller({ path: 'favorites', version: '1' })
@@ -16,8 +16,11 @@ export class FavoriteController {
     constructor(private readonly favoriteService: FavoriteService) {}
 
     @Get()
-    async getFavorites(@Req() { user }: RequestWithUser): Promise<GetSummariesResponse> {
-        return this.favoriteService.getUserFavorites({ userId: user.id });
+    async getFavorites(
+        @Req() { user }: RequestWithUser,
+        @Query() { skip, take, search }: GetSummariesQuery
+    ): Promise<GetSummariesResponse> {
+        return this.favoriteService.getUserFavorites({ userId: user.id, params: { skip, take, search } });
     }
 
     @Post(':summaryId')

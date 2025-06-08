@@ -7,6 +7,8 @@ import { PrismaModule } from '@/prisma.module';
 import { LoggerMiddleware } from '../../common/middleware/logger.middleware';
 import { AuthModule } from '../auth/auth.module';
 import { FavoriteModule } from '../favorite/favorite.module';
+import { MailerModule } from '../mailer/mailer.module';
+import { NotificationModule } from '../notification/notification.module';
 import { SummaryModule } from '../summary/summary.module';
 import { UserModule } from '../user/user.module';
 
@@ -24,6 +26,8 @@ import { UserModule } from '../user/user.module';
         AuthModule,
         SummaryModule,
         FavoriteModule,
+        MailerModule,
+        NotificationModule,
     ],
 })
 export class AppModule {

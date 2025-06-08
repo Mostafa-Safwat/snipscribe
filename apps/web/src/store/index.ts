@@ -5,17 +5,19 @@ import storage from 'redux-persist/lib/storage';
 // Import reducers
 import themeReducer from './slices/themeSlice';
 import authReducer from './slices/authSlice';
+import redirectPathReducer from './slices/redirectPathSlice';
 
 // Configure Redux Persist
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['theme', 'auth'],
+    whitelist: ['theme', 'auth', 'redirectPath'],
 };
 
 const rootReducer = combineReducers({
     theme: themeReducer,
     auth: authReducer,
+    redirectPath: redirectPathReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
