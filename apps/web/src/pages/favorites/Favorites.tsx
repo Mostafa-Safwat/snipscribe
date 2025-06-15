@@ -70,7 +70,7 @@ const History: React.FC = () => {
                                 summaryText={summary.body}
                                 title={summary.title}
                                 language={summary.summaryRequest?.language || 'English'}
-                                isInFavorites={!!summary.favorites?.length}
+                                isInFavorites={true}
                                 onClick={() => navigate(`/summary/${summary.id}`)}
                             />
                         </Grid>

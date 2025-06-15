@@ -6,6 +6,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { MiniSummaryCardProps } from './types';
 import { favoriteService } from '@/services/favorite.service';
 import { toast } from 'react-toastify';
+import { summaryService } from '@/services/summary.service';
 
 const MiniSummaryCard: React.FC<MiniSummaryCardProps> = ({
     id,
@@ -25,35 +26,46 @@ const MiniSummaryCard: React.FC<MiniSummaryCardProps> = ({
     const preview = summaryText.length > 100 ? `${summaryText.slice(0, 100)}...` : summaryText;
 
     const handleFavorite = async () => {
-        if (submitting) return;
-
-        const { addSummaryToFavorites, removeSummaryFromFavorites } = favoriteService();
-
-        setSubmitting(true);
-
-        if (favorite) {
-            await removeSummaryFromFavorites({ summaryId: id });
-
-            toast.success('Summary removed from favorites');
-        } else {
-            await addSummaryToFavorites({ summaryId: id });
-
-            toast.success('Summary added to favorites');
-        }
-
-        setFavorite(!favorite);
-
         if (onFavorite) {
             onFavorite();
-        }
+        } else {
+            if (submitting) return;
 
-        setSubmitting(false);
+            const { addSummaryToFavorites, removeSummaryFromFavorites } = favoriteService();
+
+            setSubmitting(true);
+
+            if (favorite) {
+                await removeSummaryFromFavorites({ summaryId: id });
+
+                toast.success('Summary removed from favorites');
+            } else {
+                await addSummaryToFavorites({ summaryId: id });
+
+                toast.success('Summary added to favorites');
+            }
+
+            setFavorite(!favorite);
+
+            setSubmitting(false);
+        }
     };
 
-    const handleShare = () => {
+    const handleShare = async () => {
         if (onShare) {
             onShare();
         } else {
+            if (submitting) return;
+
+            const { updateSummarySharedStatus, getSummary } = summaryService();
+
+            setSubmitting(true);
+
+            const summary = await getSummary({ summaryId: id });
+            await updateSummarySharedStatus({ summaryId: id, updateSummaryDto: { isShared: !summary.isShared } });
+
+            setSubmitting(false);
+
             const rootUrl = window.location.origin;
             const summaryUrl = `${rootUrl}/summary/${id}`;
             navigator.clipboard.writeText(summaryUrl);

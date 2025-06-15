@@ -71,7 +71,7 @@ const handle401 = async (context: ResponseContext & { init: RequestInitWithRetri
 
         store.dispatch(logout());
 
-        window.location.href = `/signin?redirect=${pathname}`;
+        window.location.href = `/signin`;
 
         const { logout: apiLogout } = authService();
         await apiLogout();
