@@ -1,0 +1,58 @@
+name: Label Linked Issues as In Review
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+jobs:
+  label_linked_issues:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up GitHub CLI
+        run: sudo apt-get install gh jq -y
+
+      - name: Get linked issues via GraphQL
+        id: get_linked_issues
+        uses: octokit/graphql-action@v2.x
+        with:
+          query: |
+            {
+              repository(owner: "${{ github.repository_owner }}", name: "${{ github.event.repository.name }}") {
+                pullRequest(number: ${{ github.event.number }}) {
+                  timelineItems(itemTypes: [CONNECTED_EVENT, DISCONNECTED_EVENT], first: 100) {
+                    nodes {
+                      __typename
+                      ... on ConnectedEvent {
+                        subject {
+                          ... on Issue {
+                            number
+                          }
+                        }
+                      }
+                      ... on DisconnectedEvent {
+                        subject {
+                          ... on Issue {
+                            number
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Label linked issues
+        run: |
+          issues=$(echo '${{ steps.get_linked_issues.outputs.data }}' | jq -r '.repository.pullRequest.timelineItems.nodes[] | select(.__typename=="ConnectedEvent") | .subject.number')
+
+          for issue_number in $issues; do
+            echo "Labeling issue #$issue_number as '👀 In review'"
+            gh issue edit "$issue_number" --add-label "👀 In review"
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
