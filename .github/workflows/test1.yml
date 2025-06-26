@@ -1,36 +1,36 @@
-name: Label Linked Issues as In Review
-
+name: Set Linked Issues Status to In Review
 on:
   pull_request:
     types: [opened, reopened, ready_for_review]
 
 jobs:
-  label_linked_issues:
+  set_linked_issues_status:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Set up GitHub CLI
-        run: sudo apt-get install gh jq -y
+      - name: Install dependencies
+        run: sudo apt-get install -y jq
 
-      - name: Get linked issues via GraphQL
+      - uses: octokit/graphql-action@v2.x
         id: get_linked_issues
-        uses: octokit/graphql-action@v2.x
+        name: Get linked issues
         with:
           query: |
             {
-              repository(owner: "${{ github.repository_owner }}", name: "${{ github.event.repository.name }}") {
-                pullRequest(number: ${{ github.event.number }}) {
-                  timelineItems(itemTypes: [CONNECTED_EVENT, DISCONNECTED_EVENT], first: 100) {
+              resource(url: "https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/pull/${{ github.event.number }}") {
+                ... on PullRequest {
+                  timelineItems(itemTypes: [CONNECTED_EVENT, DISCONNECTED_EVENT], first: 250) {
                     nodes {
-                      __typename
                       ... on ConnectedEvent {
+                        __typename
                         subject {
                           ... on Issue {
                             number
+                            id
                           }
                         }
                       }
                       ... on DisconnectedEvent {
+                        __typename
                         subject {
                           ... on Issue {
                             number
@@ -45,14 +45,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Label linked issues
-        run: |
-          issues=$(echo '${{ steps.get_linked_issues.outputs.data }}' | jq -r '.repository.pullRequest.timelineItems.nodes[] | select(.__typename=="ConnectedEvent") | .subject.number')
-
-          for issue_number in $issues; do
-            echo "Labeling issue #$issue_number as '👀 In review'"
-            gh issue edit "$issue_number" --add-label "👀 In review"
-          done
+      - name: Set status of linked issues to '👀 In review'
         env:
+          LINKED_ISSUES: ${{ steps.get_linked_issues.outputs.data }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
+          GH_REPO: ${{ github.repository_owner }}/${{ github.event.repository.name }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          STATUS_FIELD_ID: ${{ secrets.STATUS_FIELD_ID }}
+        run: |
+          linked_issues="$(echo "$LINKED_ISSUES")"
+          mapfile -t connectedIssues < <(echo "$linked_issues" | jq -r '.resource.timelineItems.nodes[] | select(.__typename == "ConnectedEvent") | .subject.number')
+
+          for issue in "${connectedIssues[@]}"; do
+            echo "Processing issue #$issue"
+            # Get project item ID (replace `ORG` and `PROJECT_NUMBER` accordingly)
+            item_id=$(gh project item-list $PROJECT_ID --owner ${{ github.repository_owner }} --json content | jq -r ".[] | select(.content.number==$issue) | .id")
+            if [ -z "$item_id" ]; then
+              echo "No project item found for issue #$issue"
+              continue
+            fi
+            # Set the status field
+            gh project item-edit $PROJECT_ID --id "$item_id" --field-id $STATUS_FIELD_ID --value "👀 In review"
+          done
