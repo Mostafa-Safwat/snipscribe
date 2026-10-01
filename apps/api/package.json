@@ -14,7 +14,7 @@
         "start:debug": "nest start --debug --watch",
         "start:prod": "node dist/main",
         "generate": "nest start -- --only-generate-swagger",
-        "seed": "ts-node -r tsconfig-paths/signup src/seed.ts",
+        "seed": "ts-node -r tsconfig-paths/register src/seed.ts",
         "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
     },
     "dependencies": {

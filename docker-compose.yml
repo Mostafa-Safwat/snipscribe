@@ -19,7 +19,7 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=root
-      - MARIADB_DATABASE=snipscribe
+      - POSTGRES_DB=snipscribe
       - POSTGRES_USER=root
     volumes:
       - db_data_development:/var/lib/postgresql

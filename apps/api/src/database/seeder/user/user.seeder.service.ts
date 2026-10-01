@@ -5,7 +5,7 @@ import { ISeeder } from '@/database/seeder';
 import { PrismaService } from '@/prisma.service';
 import { encryptPassword } from '@/utils/password';
 
-import { users } from './data';
+import { getUsers } from './data';
 
 @Injectable()
 export class UserSeederService implements ISeeder {
@@ -13,6 +13,11 @@ export class UserSeederService implements ISeeder {
 
     async seed(): Promise<void> {
         console.log('Seeding users...');
+        const users = getUsers();
+        if (!users.length) {
+            console.log('SEED_ADMIN_USERNAME, SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD are not set in .env, skipping.');
+            return;
+        }
         await Promise.all(
             users.map(async user => {
                 user.password = await encryptPassword(user.password);

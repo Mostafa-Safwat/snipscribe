@@ -1,11 +1,11 @@
 {
     "pipeline": {
         "build": {
-            "dependsOn": ["^db:generate", "^build", "generate"],
+            "dependsOn": ["db:generate", "^db:generate", "^build", "generate"],
             "outputs": ["dist/**"]
         },
         "generate": {
-            "dependsOn": ["^generate", "^build"]
+            "dependsOn": ["^db:generate", "^generate", "^build"]
         },
         "lint": {
             "outputs": []
