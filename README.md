@@ -4,7 +4,7 @@ Turn YouTube videos into short summaries with key points, in English or Arabic.
 
 Paste a YouTube link. SnipScribe downloads the audio, transcribes it with Whisper and summarizes it with Qwen 3 running locally in Ollama, so no paid AI APIs are involved.
 
-This repository holds the web app and the API. The transcription and summarization worker lives in [snipscribe](https://github.com/Mostafa-Safwat/snipscribe).
+This repository holds the web app and the API. The transcription and summarization worker lives in [snipscribe-worker](https://github.com/Mostafa-Safwat/snipscribe-worker).
 
 ![SnipScribe landing page](docs/screenshots/landing.png)
 
@@ -39,7 +39,7 @@ flowchart LR
 ```
 
 1. The web app sends the link and language to the API. The API stores the request with a pending summary for the video.
-2. The [worker](https://github.com/Mostafa-Safwat/snipscribe) picks up pending summaries. It downloads the audio, transcribes it, summarizes the transcript, marks the summary completed and queues a notification.
+2. The [worker](https://github.com/Mostafa-Safwat/snipscribe-worker) picks up pending summaries. It downloads the audio, transcribes it, summarizes the transcript, marks the summary completed and queues a notification.
 3. A cron job in the API emails each queued notification, unless the user turned notifications off.
 
 The web app talks to the API through a client generated from the API's OpenAPI spec, so the frontend and backend share one set of types.
@@ -67,7 +67,7 @@ packages/
 
 ## Running locally
 
-You need Node.js 22+, Yarn 1, Docker, and Java, which the OpenAPI client generator runs on. To actually produce summaries, also set up the [worker](https://github.com/Mostafa-Safwat/snipscribe).
+You need Node.js 22+, Yarn 1, Docker, and Java, which the OpenAPI client generator runs on. To actually produce summaries, also set up the [worker](https://github.com/Mostafa-Safwat/snipscribe-worker).
 
 ```sh
 # 1. Install dependencies
